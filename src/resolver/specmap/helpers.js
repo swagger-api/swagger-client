@@ -1,4 +1,4 @@
-import traverse from 'neotraverse/legacy';
+import { forEach } from 'neotraverse';
 import { url } from '@swagger-api/apidom-reference/configuration/empty';
 
 import { DEFAULT_BASE_URL } from '../../constants.js';
@@ -59,12 +59,12 @@ export function generateAbsoluteRefPatches(
 ) {
   const patches = [];
 
-  traverse(obj).forEach(function callback() {
-    if (targetKeys.includes(this.key) && typeof this.node === 'string') {
-      const nodePath = this.path; // this node's path, relative to `obj`
-      const fullPath = basePath.concat(this.path);
+  forEach(obj, (ctx, node) => {
+    if (targetKeys.includes(ctx.key) && typeof node === 'string') {
+      const nodePath = ctx.path; // this node's path, relative to `obj`
+      const fullPath = basePath.concat(ctx.path);
 
-      const absolutifiedRefValue = absolutifyPointer(this.node, getBaseUrlForNodePath(nodePath));
+      const absolutifiedRefValue = absolutifyPointer(node, getBaseUrlForNodePath(nodePath));
 
       patches.push(specmap.replace(fullPath, absolutifiedRefValue));
     }
