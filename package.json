@@ -102,7 +102,7 @@
     "@commitlint/config-conventional": "^20.4.1",
     "babel-loader": "=10.1.1",
     "cross-env": "=10.1.0",
-    "eslint": "^8.42.0",
+    "eslint": "^10.9.1",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "=10.1.8",
     "eslint-plugin-import": "=2.32.0",
