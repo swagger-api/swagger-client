@@ -142,6 +142,22 @@ describe('resolve', () => {
             expect(resolvedSpec).toMatchSnapshot();
           });
         });
+
+        describe('and baseDoc option has a non-http(s) scheme', () => {
+          test('should dereference internal $refs', async () => {
+            const spec = globalThis.loadJsonFile(path.join(fixturePath, 'petstore.json'));
+            const resolvedSpec = await SwaggerClient.resolve({
+              spec,
+              baseDoc: 'file:///app/index.html',
+            });
+
+            expect(resolvedSpec.errors).toEqual([]);
+            expect(
+              resolvedSpec.spec.paths['/pets'].get.responses['200'].content['application/json']
+                .schema
+            ).toMatchObject({ type: 'array' });
+          });
+        });
       });
 
       describe('and url option is provided', () => {
