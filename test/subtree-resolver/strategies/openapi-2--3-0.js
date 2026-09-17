@@ -1,6 +1,9 @@
 import * as undici from 'undici';
 
 import resolve from '../../../src/subtree-resolver/index.js';
+import { plugins } from '../../../src/resolver/specmap/index.js';
+
+const { refs } = plugins;
 
 describe('subtree $ref resolver', () => {
   let mockAgent;
@@ -19,7 +22,7 @@ describe('subtree $ref resolver', () => {
   });
 
   beforeEach(() => {
-    // refs.clearCache()
+    refs.clearCache();
   });
 
   test('should resolve a subtree of an object, and return the targeted subtree', async () => {
@@ -95,6 +98,85 @@ describe('subtree $ref resolver', () => {
         },
       },
     });
+  });
+
+  test('should terminate recursive external JSON Schema refs while resolving a schema subtree', async () => {
+    const mockPool = mockAgent.get('http://mock.swagger.test');
+    mockPool.intercept({ path: '/gdd/object.json' }).reply(
+      200,
+      {
+        type: 'object',
+        properties: {
+          entries: {
+            type: 'array',
+            items: {
+              $ref: 'http://mock.swagger.test/gdd/basic-types.json',
+            },
+          },
+        },
+      },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+    mockPool.intercept({ path: '/gdd/basic-types.json' }).reply(
+      200,
+      {
+        oneOf: [
+          {
+            type: 'array',
+            items: {
+              $ref: 'http://mock.swagger.test/gdd/object.json',
+            },
+          },
+          {
+            type: 'object',
+            properties: {
+              nested: {
+                $ref: 'http://mock.swagger.test/gdd/object.json',
+              },
+            },
+          },
+        ],
+      },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+
+    const input = {
+      openapi: '3.0.3',
+      info: {
+        title: 'Recursive external JSON Schema refs',
+        version: '1.0.0',
+      },
+      paths: {},
+      components: {
+        schemas: {
+          RenderTargetSchema: {
+            type: 'object',
+            properties: {
+              gdd: {
+                $ref: '#/components/schemas/ShallowGDDObjectSchema',
+              },
+            },
+          },
+          ShallowGDDObjectSchema: {
+            allOf: [
+              {
+                $ref: 'http://mock.swagger.test/gdd/object.json',
+              },
+            ],
+          },
+        },
+      },
+    };
+
+    const res = await resolve(input, ['components', 'schemas', 'RenderTargetSchema']);
+
+    expect(res.errors).toEqual([]);
+    expect(res.spec.properties.gdd.properties.entries.items.oneOf[0].items.$ref).toEqual(
+      'http://mock.swagger.test/gdd/object.json'
+    );
+    expect(
+      res.spec.properties.gdd.properties.entries.items.oneOf[1].properties.nested.$ref
+    ).toEqual('http://mock.swagger.test/gdd/object.json');
   });
 
   test('should return null when the path is invalid', async () => {
