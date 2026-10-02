@@ -4,6 +4,20 @@
 
 **Swagger Client** is a JavaScript module that allows you to fetch, resolve, and interact with Swagger/OpenAPI documents.
 
+## Table of Contents
+
+ - [New](#new)
+ - [Compatibility](#compatibility)
+ - [Anonymized analytics](#anonymized-analytics)
+ - [Documentation](#documentation)
+  - [Usage](#usage)
+  - [Development](#development)
+  - [Migrations](#migrations)
+ - [Runtime](#runtime)
+  - [Node js](#nodejs)
+  - [Browsers](#browsers)
+ - [Security Contact](#security-contact)
+
 ## New!
 
 **This is the new version of Swagger Client, 3.x.** The new version supports Swagger 2.0 as well as OpenAPI 3.
@@ -46,7 +60,7 @@ Alternatively, you can set the environment variable `SCARF_ANALYTICS` to `false`
 
 ## Documentation
 
-#### Usage
+### Usage
 
 - [Installation](docs/usage/installation.md)
 - [Tags Interface](docs/usage/tags-interface.md)
@@ -55,20 +69,20 @@ Alternatively, you can set the environment variable `SCARF_ANALYTICS` to `false`
 - [HTTP Client](docs/usage/http-client.md)
 - [Swagger Client API](docs/usage/api.md)
 
-#### Development
+### Development
 
 - [Contributing](https://github.com/swagger-api/.github/blob/main/CONTRIBUTING.md)
 - [Setting up](docs/development/setting-up.md)
 - [Scripts](docs/development/scripts.md)
 
-#### Migrations 
+### Migrations 
 
 - [Migration guide](docs/migration/migration-2-x-to-3-x.md)
 - [Graveyard](docs/migration/graveyard-3-x.md)
 
-### Runtime 
+## Runtime 
 
-### Node.js
+#### Node.js
 
 `swagger-client` requires Node.js `>=22` and uses [native Node.js fetch](https://nodejs.org/dist/latest-v22.x/docs/api/globals.html#fetch).
 Node.js `12`, `14`, `16`, `18`, and `20` are EOL and are no longer supported.
@@ -76,7 +90,7 @@ Node.js `12`, `14`, `16`, `18`, and `20` are EOL and are no longer supported.
 > NOTE: swagger-client minimum Node.js runtime version aligns with [Node.js Releases](https://nodejs.org/en/about/releases/)
 > which means that we can drop support for **EOL** (End Of Life) Node.js versions without doing major version bump.
 
-### Browsers
+#### Browsers
 
 `swagger-client` works in the latest versions of Chrome, Safari, Firefox, and Edge
 and uses [native fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) implementation
