@@ -564,7 +564,13 @@ class OpenAPI3_1SwaggerClientDereferenceVisitor extends OpenAPI3_1DereferenceVis
          * No SchemaElement($id=URL) was not found, so we're going to try to resolve
          * the URL and assume the returned response is a JSON Schema.
          */
-        if (isURL && error instanceof EvaluationJsonSchemaUriError) {
+        const isSameDocumentReference =
+          $refBaseURIStrippedHash === url.stripHash(this.reference.uri);
+
+        if (
+          (isURL || (isUnknownURI && isSameDocumentReference)) &&
+          error instanceof EvaluationJsonSchemaUriError
+        ) {
           if (isAnchor(uriToAnchor($refBaseURI))) {
             // we're dealing with JSON Schema $anchor here
             isInternalReference = url.stripHash(this.reference.uri) === retrievalURI;
