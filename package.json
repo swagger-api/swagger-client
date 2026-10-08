@@ -93,7 +93,7 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.21.0",
-    "@babel/core": "^7.21.0",
+    "@babel/core": "^8.0.1",
     "@babel/eslint-parser": "^7.24.5",
     "@babel/plugin-transform-runtime": "^7.21.0",
     "@babel/preset-env": "^7.20.2",
