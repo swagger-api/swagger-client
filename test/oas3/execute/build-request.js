@@ -212,4 +212,67 @@ describe('buildRequest - OAS 3.0.x', () => {
       });
     });
   });
+
+  describe('given string values that look like JSON primitives', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        version: { type: 'string' },
+        options: {
+          type: 'object',
+          properties: {
+            max_bar: { type: 'integer' },
+          },
+        },
+      },
+    };
+    const spec = {
+      openapi: '3.0.4',
+      paths: {
+        '/upload/': {
+          post: {
+            operationId: 'upload',
+            requestBody: {
+              content: {
+                'application/x-www-form-urlencoded': { schema },
+                'multipart/form-data': { schema },
+              },
+            },
+          },
+        },
+      },
+    };
+    const requestBody = {
+      id: '1234567890123456789',
+      version: '1.0',
+      options: '{"max_bar":300}',
+    };
+
+    test('should keep them unchanged in application/x-www-form-urlencoded request', () => {
+      const req = buildRequest({
+        spec,
+        operationId: 'upload',
+        requestBody,
+        requestContentType: 'application/x-www-form-urlencoded',
+      });
+
+      expect(req.body).toEqual(
+        'id=1234567890123456789&version=1.0&options=%7B%22max_bar%22%3A300%7D'
+      );
+    });
+
+    test('should keep them unchanged in multipart/form-data request', () => {
+      const req = buildRequest({
+        spec,
+        operationId: 'upload',
+        requestBody,
+        requestContentType: 'multipart/form-data',
+      });
+
+      expect(req.formdata.get('id')).toEqual('1234567890123456789');
+      expect(req.formdata.get('version')).toEqual('1.0');
+      expect(req.formdata.get('options')).toEqual('{"max_bar":300}');
+    });
+  });
 });

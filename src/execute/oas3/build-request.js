@@ -64,11 +64,16 @@ export default function buildRequest(options, req) {
 
             req.form = {};
             Object.keys(requestBody).forEach((k) => {
-              let value;
+              let value = requestBody[k];
               try {
-                value = JSON.parse(requestBody[k]);
+                const parsedValue = JSON.parse(value);
+                // only objects and arrays need decoding; decoding primitives can
+                // change the value (e.g. '1.0' becomes 1, big integers lose precision)
+                if (typeof parsedValue === 'object' && parsedValue !== null) {
+                  value = parsedValue;
+                }
               } catch {
-                value = requestBody[k];
+                // not a JSON string, keep the value as it is
               }
               req.form[k] = {
                 value,
