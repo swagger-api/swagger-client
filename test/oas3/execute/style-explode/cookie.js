@@ -368,4 +368,62 @@ describe('OAS 3.0 - buildRequest w/ `style` & `explode` - cookie parameters', ()
       });
     });
   });
+
+  describe('multiple cookie parameters', () => {
+    test('should build all cookie parameters into a single Cookie header', () => {
+      // Given
+      const spec = {
+        openapi: '3.0.4',
+        paths: {
+          '/users': {
+            get: {
+              operationId: 'myOperation',
+              parameters: [
+                {
+                  name: 'c1',
+                  in: 'cookie',
+                },
+                {
+                  name: 'c2',
+                  in: 'cookie',
+                  explode: true,
+                },
+                {
+                  name: 'c3',
+                  in: 'cookie',
+                  content: {
+                    'application/json': {
+                      schema: {
+                        type: 'object',
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      };
+
+      // when
+      const req = buildRequest({
+        spec,
+        operationId: 'myOperation',
+        parameters: {
+          c1: 'v1',
+          c2: ['a', 'b'],
+          c3: { a: 1 },
+        },
+      });
+
+      expect(req).toEqual({
+        method: 'GET',
+        url: '/users',
+        credentials: 'same-origin',
+        headers: {
+          Cookie: 'c1=v1; c2=c2%3Da%26c2%3Db; c3={%22a%22:1}',
+        },
+      });
+    });
+  });
 });
