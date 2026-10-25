@@ -422,6 +422,19 @@ const checkOpenAPIUnwired = (n, p) => {
 const checkJSONSchema = (id, d) => {
   const label = `JSON Schema ${id}`;
   checkUpstream(`apidom-ns-json-schema-${d.pkg}`, `json-schema-${d.pkg}`, label);
+  // The dereference strategy traverses with the namespace's keyMap and getNodeType; the 2020-12
+  // namespace didn't export them on 2026-10-25 (ApiDOM phase 3 adds them).
+  const namespaceDir = `node_modules/@swagger-api/apidom-ns-json-schema-${d.pkg}`;
+  if (existsSync(path(namespaceDir))) {
+    const namespaceIndex = read(namespaceDir, 'src/index.cjs') || read(namespaceDir, 'src/index.mjs');
+    check(
+      ['keyMap', 'getNodeType'].every((name) => namespaceIndex.includes(name)),
+      'upstream',
+      `@swagger-api/apidom-ns-json-schema-${d.pkg} exports keyMap and getNodeType`,
+      `@swagger-api/apidom-ns-json-schema-${d.pkg} doesn't export keyMap and getNodeType: ApiDOM phase 3 for ${label}`,
+      'UPSTREAM'
+    );
+  }
 
   const predicates = read('src/helpers/json-schema-predicates.js');
   check(

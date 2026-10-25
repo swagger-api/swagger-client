@@ -64,6 +64,18 @@ else
   echo "SKIP a964cd06 replay: commit not in this clone"
 fi
 
+# minimal checkout whose installed 2020-12 namespace lacks, then has, keyMap/getNodeType exports
+root="$(mktemp -d)"
+namespace="$root/node_modules/@swagger-api/apidom-ns-json-schema-2020-12/src"
+mkdir -p "$root/src/resolver/strategies" "$namespace"
+echo 'exports.refract = refract;' >"$namespace/index.cjs"
+expect_output "UPSTREAM +upstream +.*doesn't export keyMap and getNodeType" \
+  node "$DIR/spec-status.mjs" --root "$root" --json-schema 2020-12
+echo 'exports.keyMap = keyMap; exports.getNodeType = getNodeType;' >"$namespace/index.cjs"
+expect_output "OK +upstream +.*exports keyMap and getNodeType" \
+  node "$DIR/spec-status.mjs" --root "$root" --json-schema 2020-12
+rm -rf "$root"
+
 expect "0" node "$DIR/verify-urls.mjs" --help
 expect "2" node "$DIR/verify-urls.mjs"
 

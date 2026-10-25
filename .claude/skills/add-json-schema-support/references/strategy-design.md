@@ -7,7 +7,7 @@ are in `dialects.md`; 2020-12 below.
 
 ## ApiDOM Prerequisites
 
-From the installed ApiDOM release (Step 0 checks the first two):
+From the installed ApiDOM release (Step 0's `spec-status.mjs` checks all three):
 
 - apidom-reference `resolve/strategies/json-schema-2020-12` and
   `dereference/strategies/json-schema-2020-12` with `selectors/$anchor` and `selectors/uri`
