@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: oas-3-2-real-defect
+expected_outcome: |
+  The review of OpenAPI 3.2 at a964cd06 (#4153) finds, with file:line evidence: the subtree
+  resolver's skipNormalization condition names only isOpenAPI31 (a blocker, later fixed by #4295);
+  openapi-3-2-apidom/resolve.js uses apidom-reference's openapi-3-1 resolve strategy; the
+  predicate test has no isOpenAPI32 block and the 3.2 dereference tests mirror few of 3.1's. It
+  changes no files.

@@ -392,6 +392,12 @@ import btoa from './helpers/btoa.browser.js';
 
 ## Common Tasks and Patterns
 
+### Adding an OpenAPI Version or a JSON Schema Dialect
+
+Use the skills in `.claude/skills/` (`.claude/skills/README.md` explains them): `/add-oas-support`
+for a new OpenAPI version, `/add-json-schema-support` for resolving standalone JSON Schema
+documents, `/review-spec-support` to review either.
+
 ### Adding Support for New OpenAPI Features
 
 1. **Identify the OpenAPI version** (2.0, 3.0, 3.1, 3.2)
