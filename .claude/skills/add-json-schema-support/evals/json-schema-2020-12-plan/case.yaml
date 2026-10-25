@@ -6,4 +6,5 @@ expected_outcome: |
   prerequisites, and plans a root-only $schema predicate, the json-schema-2020-12-apidom strategy
   from openapi-3-1-apidom, a schema-only swagger-client dereference strategy that leaves
   $dynamicRef in place, registration before generic, tests including OpenAPI 3.1 and refused
-  $schema regressions, the allOf/macro decision with a recommendation, and the Swagger UI hand-off.
+  $schema regressions, allOf merging and modelPropertyMacro as for OpenAPI 3.1 (already decided),
+  and the Swagger UI hand-off.

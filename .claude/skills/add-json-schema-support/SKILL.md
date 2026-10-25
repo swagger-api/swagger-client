@@ -40,8 +40,9 @@ resolves `$ref`s through swagger-client, so swagger-client owns `$ref` resolutio
 1. Create `ADD-JSON-SCHEMA-{DIALECT}.md` (uncommitted) from
    `../add-oas-support/references/tracking-doc-template.md`, with the status output, the ApiDOM
    version and the PR plan from `references/design-and-delivery.md`.
-2. Record the answered decisions as given and put the open one (allOf merging and macros) to the
-   user with its recommendation. As a subagent, plan with the recommendation and say so.
+2. Record the decisions in `references/design-and-delivery.md` as given; all are answered. A
+   question they don't cover goes to the user with your recommendation; as a subagent, plan with
+   the recommendation and say so.
 
 ## Step 2: Build (one PR per dialect)
 

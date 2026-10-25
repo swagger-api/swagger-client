@@ -25,14 +25,9 @@ Answered (record them in the tracking doc as given):
    the predicate doesn't match them and they keep the `generic` strategy.
 4. **Bundling** is out of scope here: swagger-client dereferences; bundling is apidom-reference's
    `bundle()` (deferred there too).
-
-Open (put to the user at Step 1, with the recommendation):
-
-5. **allOf merging and macros.** The OpenAPI dereference strategies merge `allOf` (unless
-   `mode: 'strict'`) and apply `modelPropertyMacro`. Recommendation: the same for standalone
-   schemas, so a schema renders the same standalone and inside an OpenAPI 3.1 document, the rule
-   decisions 2 and 3 already follow. The alternative (plain dereference) keeps `allOf` as written,
-   which Swagger UI's 2020-12 renderer can show as a keyword.
+5. **allOf merging and macros** (2026-10-25): as for OpenAPI 3.1 Schema Objects. The dereference
+   strategy merges `allOf` unless `mode: 'strict'` and applies `modelPropertyMacro`, so a schema
+   resolves the same standalone and inside an OpenAPI 3.1 document.
 
 ## PR Plan
 
