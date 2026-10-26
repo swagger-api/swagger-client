@@ -1,10 +1,13 @@
 schema_version: "1.1"
 name: oas-3-2-replay
 expected_outcome: |
-  PLAN.md starts with the ApiDOM prerequisites (apidom-ns-openapi-3-2, apidom-reference openapi-3-2
-  resolve and dereference strategies), then lists swagger-client's integration points: isOpenAPI32
-  and isOpenAPI3, the openapi-3-2-apidom strategy importing only 3.2 ApiDOM pieces, the 3.2 parsers
-  and openapi-3-2-swagger-client dereference strategy with 3.1's visitors, registration in
-  Swagger.resolveStrategies, both strategy arrays and Swagger.apidom, the subtree resolver's
-  skipNormalization condition, ESLint patterns, the webpack limit, dependencies and docs, tests
-  mirrored from 3.1, and 3.2 features (additionalOperations) in separate version-gated PRs.
+  PLAN.md starts with the ApiDOM prerequisites: the locked ApiDOM (1.5.1) lacks
+  apidom-ns-openapi-3-2 and apidom-reference's openapi-3-2 strategies, a release on the registry
+  has them, so every @swagger-api/apidom-* package is bumped to it first. It then lists
+  swagger-client's integration points: isOpenAPI32 and isOpenAPI3, the openapi-3-2-apidom strategy
+  importing only 3.2 ApiDOM pieces, the 3.2 parsers and openapi-3-2-swagger-client dereference
+  strategy with 3.1's visitors, registration in Swagger.resolveStrategies, both strategy arrays
+  and Swagger.apidom, the subtree resolver's skipNormalization condition, ESLint patterns, the
+  webpack limit, dependencies with the adapters stubbed in overrides as at this commit, docs and
+  tests mirrored from 3.1. The first PR stays at parity with 3.1; 3.2 features
+  (additionalOperations, $self, querystring) follow in separate PRs gated with isOpenAPI32.

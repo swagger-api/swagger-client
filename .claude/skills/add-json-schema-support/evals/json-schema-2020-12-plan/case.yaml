@@ -3,8 +3,8 @@ name: json-schema-2020-12-plan
 expected_outcome: |
   PLAN.md explains that standalone 2020-12 documents fall to the generic strategy today, makes
   apidom-reference's json-schema-2020-12 strategies and the namespace's keyMap/getNodeType exports
-  prerequisites, and plans a root-only $schema predicate, the json-schema-2020-12-apidom strategy
-  from openapi-3-1-apidom, a schema-only swagger-client dereference strategy that leaves
-  $dynamicRef in place, registration before generic, tests including OpenAPI 3.1 and refused
-  $schema regressions, allOf merging and modelPropertyMacro as for OpenAPI 3.1 (already decided),
-  and the Swagger UI hand-off.
+  prerequisites with no interim engine while they are missing, and plans a root-only $schema
+  predicate, the json-schema-2020-12-apidom strategy from an OpenAPI ApiDOM strategy, a
+  schema-only swagger-client dereference strategy that leaves $dynamicRef in place, registration
+  before generic, tests including OpenAPI 3.1 and refused $schema regressions, allOf merging and
+  modelPropertyMacro as for OpenAPI 3.1 (already decided), and the Swagger UI hand-off.
