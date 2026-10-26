@@ -77,10 +77,10 @@
     "@swagger-api/apidom-core": "^1.13.3",
     "@swagger-api/apidom-error": "^1.13.3",
     "@swagger-api/apidom-json-pointer": "^1.13.3",
-    "@swagger-api/apidom-ns-json-schema-2020-12": "^1.13.3",
+    "@swagger-api/apidom-ns-json-schema-2020-12": "file:../upstream-tarballs/swagger-api-apidom-ns-json-schema-2020-12-1.13.3-11951862a.tgz",
     "@swagger-api/apidom-ns-openapi-3-1": "^1.13.3",
     "@swagger-api/apidom-ns-openapi-3-2": "^1.13.3",
-    "@swagger-api/apidom-reference": "^1.13.3",
+    "@swagger-api/apidom-reference": "file:../upstream-tarballs/swagger-api-apidom-reference-1.13.3-11951862a.tgz",
     "@swaggerexpert/cookie": "^2.0.2",
     "deepmerge": "~4.3.0",
     "fast-json-patch": "^3.0.0-1",
@@ -154,6 +154,10 @@
     "@swagger-api/apidom-parser-adapter-arazzo-json-1": "^1.13.3",
     "@swagger-api/apidom-parser-adapter-arazzo-yaml-1": "^1.13.3",
     "@swagger-api/apidom-parser-adapter-yaml-1-2": "^1.13.3"
+  },
+  "overrides": {
+    "@swagger-api/apidom-ns-json-schema-2020-12": "$@swagger-api/apidom-ns-json-schema-2020-12",
+    "@swagger-api/apidom-reference": "$@swagger-api/apidom-reference"
   },
   "allowScripts": {
     "tree-sitter@0.22.4": true,
