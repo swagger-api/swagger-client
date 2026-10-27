@@ -306,5 +306,86 @@ describe('resolve', () => {
         });
       });
     });
+
+    describe('given recursive Schema Objects resolved as subtrees', () => {
+      const baseDoc = 'https://example.com/openapi.json';
+      const recursiveSpec = () => ({
+        openapi: '3.2.0',
+        info: { title: 'Tree', version: '1.0.0' },
+        paths: {},
+        components: {
+          schemas: {
+            Node: {
+              type: 'object',
+              properties: {
+                name: { type: 'string' },
+                children: { type: 'array', items: { $ref: '#/components/schemas/Node' } },
+              },
+            },
+            Tree: {
+              type: 'object',
+              properties: {
+                root: {
+                  type: 'object',
+                  properties: {
+                    subtrees: { type: 'array', items: { $ref: '#/components/schemas/Tree' } },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+      const nodeCycle = { $ref: `${baseDoc}#/components/schemas/Node` };
+      const treeCycle = { $ref: `${baseDoc}#/components/schemas/Tree` };
+
+      test.each([
+        [
+          ['components', 'schemas', 'Node', 'properties'],
+          { name: { type: 'string' }, children: { type: 'array', items: nodeCycle } },
+        ],
+        [
+          ['components', 'schemas', 'Node', 'properties', 'children'],
+          { type: 'array', items: nodeCycle },
+        ],
+        [['components', 'schemas', 'Node', 'properties', 'children', 'items'], nodeCycle],
+      ])(
+        'should resolve %j with the $ref to its ancestor as a cycle',
+        async (fragmentPath, expected) => {
+          const result = await SwaggerClient.resolveSubtree(recursiveSpec(), fragmentPath, {
+            baseDoc,
+          });
+
+          expect(result).toEqual({ spec: expected, errors: [] });
+        }
+      );
+
+      test('should resolve a $ref to an ancestor further up as a cycle', async () => {
+        const result = await SwaggerClient.resolveSubtree(
+          recursiveSpec(),
+          ['components', 'schemas', 'Tree', 'properties', 'root', 'properties'],
+          { baseDoc }
+        );
+
+        expect(result).toEqual({
+          spec: { subtrees: { type: 'array', items: treeCycle } },
+          errors: [],
+        });
+      });
+
+      test('should resolve a pathDiscriminator fragment referencing its ancestor', async () => {
+        const { spec, errors } = await SwaggerClient.resolve({
+          spec: recursiveSpec(),
+          baseDoc,
+          pathDiscriminator: ['components', 'schemas', 'Node', 'properties'],
+        });
+
+        expect(errors).toEqual([]);
+        expect(spec.components.schemas.Node.properties.children).toEqual({
+          type: 'array',
+          items: nodeCycle,
+        });
+      });
+    });
   });
 });
