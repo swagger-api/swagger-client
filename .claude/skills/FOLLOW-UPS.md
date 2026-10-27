@@ -35,6 +35,12 @@ and this repository's JSON Schema dereference strategies need them; recorded in 
 exported on the ApiDOM branch `feat/json-schema-2020-12/phase-3` (`1fbd257e2`), not released yet;
 `feat/json-schema-2020-12` here uses it as a tarball.
 
+### 2.2 ⏳ Swagger UI: `fn.resolve` lacks the 3.2 strategy
+
+`src/core/plugins/swagger-client/index.js` in swagger-ui lists 3.1, 3.0, 2.0 and generic for
+`fn.resolve`, while `resolveSubtree` (the path Swagger UI uses) has 3.2. `resolveSpec` is
+deprecated, so it only affects callers of `fn.resolve`; recorded in swagger-ui's FOLLOW-UPS.
+
 ### 2.3 ⏳ ApiDOM: the `uri` selector misses relative `$id`s nested in relative `$id`s
 
 apidom-reference's `dereference/strategies/{openapi-3-1,openapi-3-2,json-schema-2020-12}/selectors/uri`
@@ -47,11 +53,17 @@ retrieval URI of the document holding the candidates); swagger-client's fixture
 `json-schema-2020-12-swagger-client/json-schema/__fixtures__/id-relative-nested` is a
 `test.failing` that starts failing once the fix is installed (then make it a regular test).
 
-### 2.2 ⏳ Swagger UI: `fn.resolve` lacks the 3.2 strategy
+### 2.4 ⏳ ApiDOM: the `$anchor` selector searches embedded schema resources
 
-`src/core/plugins/swagger-client/index.js` in swagger-ui lists 3.1, 3.0, 2.0 and generic for
-`fn.resolve`, while `resolveSubtree` (the path Swagger UI uses) has 3.2. `resolveSpec` is
-deprecated, so it only affects callers of `fn.resolve`; recorded in swagger-ui's FOLLOW-UPS.
+apidom-reference's `dereference/strategies/{openapi-3-1,openapi-3-2,json-schema-2020-12}/selectors/$anchor`
+finds the first schema in pre-order whose `$anchor` (in 2020-12 also `$dynamicAnchor`) matches, including
+schemas inside embedded `$id` resources. An anchor belongs to the schema resource containing it
+(JSON Schema Core 8.2.2), so when an embedded resource reuses the name, `"$ref": "#tag"` can
+select the embedded resource's schema instead of the referencing resource's. OpenAPI 3.1 Schema
+Objects behave the same. Fix in the same ApiDOM follow-up as 2.3 (stop the search at nested
+`$id`s); swagger-client's fixture
+`json-schema-2020-12-swagger-client/json-schema/__fixtures__/anchor-embedded-resource` is a
+`test.failing` that starts failing once the fix is installed (then make it a regular test).
 
 ## 3. Evals
 

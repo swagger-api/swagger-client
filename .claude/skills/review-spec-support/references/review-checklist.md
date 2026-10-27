@@ -14,8 +14,8 @@ are in `.claude/skills/add-oas-support/references/review-lessons.md` (numbers in
 - [ ] OpenAPI: the regex accepts every patch of the line and nothing else; `isOpenAPI3` includes
       it. Run it against the new version, the parent and the next line.
 - [ ] JSON Schema: root `$schema` only, the exact identifier with an empty fragment normalised,
-      no `openapi`/`swagger` field; refuses the other scheme, custom meta-schemas and a nested
-      `$schema`.
+      no `openapi`, `swagger`, `asyncapi` or `arazzo` field; refuses the other scheme, custom
+      meta-schemas, a nested `$schema` and API description documents with a root `$schema`.
 
 ## 3. Strategy
 

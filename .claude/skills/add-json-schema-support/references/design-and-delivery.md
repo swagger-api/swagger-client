@@ -42,6 +42,17 @@ Answered (record them in the tracking doc as given):
    same reason).
 9. **`$ref` to a `$dynamicAnchor`** (2026-10-26): resolves like one to an `$anchor`; it comes with
    apidom-reference's 2020-12 `$anchor` selector, so use that selector.
+10. **API description documents with a root `$schema`** (2026-10-27): a document is standalone
+    JSON Schema only when its root has the dialect's `$schema` and none of the API description
+    fields `openapi`, `swagger`, `asyncapi` and `arazzo`. AsyncAPI and Arazzo documents with a
+    root `$schema` keep the strategy they had (`generic`); regression tests compare them with a
+    `generic`-only resolve.
+11. **`$ref`s to ancestors of a resolved subtree** (2026-10-27): the resolve strategy seeds the
+    dereference lineage with the document root and every element along `pathDiscriminator`, so
+    a `$ref` from the fragment to an ancestor (`"$ref": "#"`) is a cycle, not endless expansion.
+    The JSON Schema strategy gets it in its own PR; the same defect in `openapi-3-1-apidom` and
+    `openapi-3-2-apidom` is fixed in a separate PR off `main`
+    (`fix/resolver-subtree-ancestor-cycles`), not in the JSON Schema PR.
 
 ## PR Plan
 

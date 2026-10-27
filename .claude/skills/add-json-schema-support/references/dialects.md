@@ -17,8 +17,10 @@ Draft 5 kept the Draft 4 meta-schema, so Draft 4 documents cover it.
 
 ## Matching (same as Swagger UI)
 
-- Only the document root's `$schema`, and only when there is no `openapi` or `swagger` field:
-  OpenAPI 3.1+ Schema Objects carry `$schema` too.
+- Only the document root's `$schema`, and only when the root has none of the API description
+  fields `openapi`, `swagger`, `asyncapi` and `arazzo` (decision 10 in `design-and-delivery.md`):
+  OpenAPI 3.1+ Schema Objects carry `$schema` too, and API description documents can declare a
+  root `$schema`; they keep their own strategy or `generic`.
 - The identifier exactly, with an empty fragment normalised: up to Draft 7 the identifiers end in
   `#`, from 2019-09 they don't; documents add or drop it.
 - Nothing else: the other scheme (`http://json-schema.org/draft/2020-12/schema`), custom

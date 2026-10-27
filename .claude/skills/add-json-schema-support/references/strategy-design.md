@@ -19,7 +19,8 @@ From the installed ApiDOM release (Step 0's `spec-status.mjs` checks all three):
 
 ## Predicate: `src/helpers/json-schema-predicates.js`
 
-`isJSONSchema202012(spec)`: a plain object, no `openapi` or `swagger` key, `$schema` a string
+`isJSONSchema202012(spec)`: a plain object, none of the keys `openapi`, `swagger`, `asyncapi` and
+`arazzo` (whatever their value), `$schema` a string
 equal to the identifier after removing an empty trailing `#`. Wrap in `try`/`catch` like
 `openapi-predicates.js`. Matching rules: `dialects.md`.
 
@@ -35,7 +36,9 @@ equal to the identifier after removing an empty trailing `#`. Wrap in `try`/`cat
   `json-schema-2020-12` resolve strategy, the parsers below plus JSON, YAML and binary, and the
   dereference strategy below. Keep the base URI logic, fragments (`pathDiscriminator`),
   `ReferenceSet`, `circularReplacer`, error collection and the invalid-pointer fallback: Swagger
-  UI resolves subtrees lazily, so fragments are the main path.
+  UI resolves subtrees lazily, so fragments are the main path. Seed the `ancestors` lineage with
+  the root and every element along `pathDiscriminator`, not the fragment alone (decision 11):
+  otherwise `"$ref": "#"` inside a resolved subtree expands until the stack overflows.
 - `normalize.js`: the identity, exported for the same shape as the other strategies.
 
 ## Parsers: `src/resolver/apidom/reference/parse/parsers/json-schema-{json,yaml}-2020-12/`
