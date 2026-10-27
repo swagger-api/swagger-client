@@ -10,7 +10,7 @@ This document provides comprehensive guidance for AI assistants working on the s
 - OpenAPI 3.0.x (3.0.0 through 3.0.4)
 - Swagger/OpenAPI 2.0
 - Legacy Swagger 1.x (via version 2.x branch)
-- Standalone JSON Schema 2020-12 documents (resolution only: root `$schema`, no `openapi`/`swagger` field)
+- Standalone JSON Schema 2020-12 documents (resolution only: root `$schema`, no `openapi`/`swagger`/`asyncapi`/`arazzo` field)
 
 **Current Version**: 3.36.0
 
@@ -311,7 +311,8 @@ Handles $ref resolution and spec normalization. Uses different strategies based 
 **Strategy Selection** (in `src/resolver/index.js`):
 Strategies are tried in order until one matches. ApiDOM is preferred for OAS 3.1. The JSON Schema
 strategy comes right before `generic`; its predicate (`src/helpers/json-schema-predicates.js`) refuses
-OpenAPI documents and any root `$schema` other than the 2020-12 identifier.
+OpenAPI, Swagger, AsyncAPI and Arazzo documents and any root `$schema` other than the 2020-12
+identifier.
 
 **SpecMap** (`src/resolver/specmap/`):
 Legacy resolution engine used by non-ApiDOM strategies. Handles:

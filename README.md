@@ -30,8 +30,8 @@ Swagger Client Version | Release Date | OpenAPI Spec compatibility              
 ### Standalone JSON Schema
 
 Swagger Client also resolves standalone JSON Schema 2020-12 documents: documents whose root `$schema` is
-`https://json-schema.org/draft/2020-12/schema` (with or without an empty fragment) and which have no `openapi`
-or `swagger` field. Their `$ref`s resolve against `$id` base URIs, `$anchor`s and external documents as in
+`https://json-schema.org/draft/2020-12/schema` (with or without an empty fragment) and which have no `openapi`,
+`swagger`, `asyncapi` or `arazzo` field. Their `$ref`s resolve against `$id` base URIs, `$anchor`s and external documents as in
 OpenAPI 3.1 Schema Objects, `allOf` is merged unless `mode: 'strict'`, and every `$dynamicRef` is left in place.
 Documents with any other `$schema` value keep the generic resolver.
 

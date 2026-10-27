@@ -104,6 +104,38 @@ describe('helpers', () => {
         ).toBe(false);
       });
 
+      test('should refuse AsyncAPI and Arazzo documents with a root $schema', () => {
+        expect(
+          isJSONSchema202012({
+            asyncapi: '3.0.0',
+            $schema: 'https://json-schema.org/draft/2020-12/schema',
+            info: { title: 'test', version: '1.0.0' },
+          })
+        ).toBe(false);
+        expect(
+          isJSONSchema202012({
+            arazzo: '1.0.1',
+            $schema: 'https://json-schema.org/draft/2020-12/schema',
+            info: { title: 'test', version: '1.0.0' },
+          })
+        ).toBe(false);
+      });
+
+      test('should refuse an API description field whatever its value', () => {
+        expect(
+          isJSONSchema202012({
+            asyncapi: null,
+            $schema: 'https://json-schema.org/draft/2020-12/schema',
+          })
+        ).toBe(false);
+        expect(
+          isJSONSchema202012({
+            arazzo: undefined,
+            $schema: 'https://json-schema.org/draft/2020-12/schema',
+          })
+        ).toBe(false);
+      });
+
       test('should refuse an OpenAPI 3.1 document with $schema in a Schema Object', () => {
         expect(
           isJSONSchema202012({

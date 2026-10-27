@@ -145,6 +145,18 @@ describe('JSONSchemaJSON2020_12Parser', () => {
         });
       });
 
+      describe('and the document is an AsyncAPI document with root $schema', () => {
+        test('should return false', async () => {
+          const file = new File({
+            uri: '/path/to/asyncapi.json',
+            data: '{"asyncapi": "3.0.0", "$schema": "https://json-schema.org/draft/2020-12/schema"}',
+          });
+          const parser = new JSONSchemaJSON2020_12Parser();
+
+          expect(await parser.canParse(file)).toBe(false);
+        });
+      });
+
       describe('and file data is not JSON', () => {
         test('should return false', async () => {
           const file = new File({

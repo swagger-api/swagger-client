@@ -644,6 +644,42 @@ describe('resolve', () => {
           );
         });
       });
+
+      describe('given an AsyncAPI or Arazzo document with a root 2020-12 $schema', () => {
+        test('should resolve an AsyncAPI 3.0 document with the generic strategy', async () => {
+          const spec = {
+            asyncapi: '3.0.0',
+            $schema,
+            channels: { a: { $ref: '#/components/channels/A' } },
+            components: { channels: { A: { address: 'a' } } },
+          };
+          const resolved = await SwaggerClient.resolve({ spec: structuredClone(spec) });
+
+          expect(jsonSchema202012ApiDOMStrategy.match(spec)).toBe(false);
+          expect(resolved).toEqual(
+            await resolveWith(genericStrategy, { spec: structuredClone(spec) })
+          );
+          expect(resolved.spec.channels.a).toEqual({
+            address: 'a',
+            $$ref: '#/components/channels/A',
+          });
+        });
+
+        test('should resolve an Arazzo 1.0.1 document with the generic strategy', async () => {
+          const spec = {
+            arazzo: '1.0.1',
+            $schema,
+            info: { title: 'test', version: '1.0.0' },
+            workflows: [{ workflowId: 'w', inputs: { $ref: '#/components/inputs/In' }, steps: [] }],
+            components: { inputs: { In: { type: 'object' } } },
+          };
+
+          expect(jsonSchema202012ApiDOMStrategy.match(spec)).toBe(false);
+          expect(await SwaggerClient.resolve({ spec: structuredClone(spec) })).toEqual(
+            await resolveWith(genericStrategy, { spec: structuredClone(spec) })
+          );
+        });
+      });
     });
   });
 });
