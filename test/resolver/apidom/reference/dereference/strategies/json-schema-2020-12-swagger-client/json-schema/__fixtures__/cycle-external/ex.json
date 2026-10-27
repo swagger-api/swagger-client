@@ -1,0 +1,16 @@
+{
+  "$defs": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "profile": { "$ref": "#/$defs/Profile" }
+      }
+    },
+    "Profile": {
+      "type": "object",
+      "properties": {
+        "parent": { "$ref": "#/$defs/User" }
+      }
+    }
+  }
+}

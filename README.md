@@ -27,6 +27,14 @@ Swagger Client Version | Release Date | OpenAPI Spec compatibility              
 3.10.x | 2020-01-17   | 2.0, 3.0.0, 3.0.1, 3.0.2, 3.0.3                         | [tag v3.10.0](https://github.com/swagger-api/swagger-client/tree/v3.10.0)
 2.1.32 | 2017-01-12   | 1.0, 1.1, 1.2                                           | [tag v2.1.32](https://github.com/swagger-api/swagger-client/tree/v2.1.32). This [release](https://github.com/swagger-api/swagger-client/releases/tag/v2.1.32) is only available on GitHub.
 
+### Standalone JSON Schema
+
+Swagger Client also resolves standalone JSON Schema 2020-12 documents: documents whose root `$schema` is
+`https://json-schema.org/draft/2020-12/schema` (with or without an empty fragment) and which have no `openapi`
+or `swagger` field. Their `$ref`s resolve against `$id` base URIs, `$anchor`s and external documents as in
+OpenAPI 3.1 Schema Objects, `allOf` is merged unless `mode: 'strict'`, and every `$dynamicRef` is left in place.
+Documents with any other `$schema` value keep the generic resolver.
+
 ## Anonymized analytics
 
 Swagger Client uses [Scarf](https://scarf.sh/) to collect [anonymized installation analytics](https://github.com/scarf-sh/scarf-js?tab=readme-ov-file#as-a-user-of-a-package-using-scarf-js-what-information-does-scarf-js-send-about-me). These analytics help support the maintainers of this library and ONLY run during installation. To [opt out](https://github.com/scarf-sh/scarf-js?tab=readme-ov-file#as-a-user-of-a-package-using-scarf-js-how-can-i-opt-out-of-analytics), you can set the `scarfSettings.enabled` field to `false` in your project's `package.json`:

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Profile": {
+      "type": "object",
+      "properties": {
+        "avatar": { "$ref": "#/$defs/Avatar" }
+      }
+    },
+    "Avatar": {
+      "type": "string",
+      "format": "uri"
+    }
+  }
+}

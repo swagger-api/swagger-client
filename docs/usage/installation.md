@@ -30,6 +30,8 @@ which means you can run `npm install --omit=optional` to speed up the installati
   "@swagger-api/apidom-parser-adapter-asyncapi-yaml-2": "^1.11.3",
   "@swagger-api/apidom-parser-adapter-asyncapi-yaml-3": "^1.11.3",
   "@swagger-api/apidom-parser-adapter-json": "^1.11.3",
+  "@swagger-api/apidom-parser-adapter-json-schema-json-2020-12": "^1.11.3",
+  "@swagger-api/apidom-parser-adapter-json-schema-yaml-2020-12": "^1.11.3",
   "@swagger-api/apidom-parser-adapter-openapi-json-2": "^1.11.3",
   "@swagger-api/apidom-parser-adapter-openapi-yaml-2": "^1.11.3",
   "@swagger-api/apidom-parser-adapter-openapi-json-3-0": "^1.11.3",
