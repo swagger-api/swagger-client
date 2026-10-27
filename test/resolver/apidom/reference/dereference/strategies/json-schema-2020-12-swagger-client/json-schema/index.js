@@ -122,6 +122,21 @@ describe('dereference', () => {
           });
         });
 
+        describe('given a $ref to an $anchor whose name an embedded schema resource uses too', () => {
+          /**
+           * An $anchor belongs to the schema resource containing it (JSON Schema Core 8.2.2), so
+           * "#tag" from the root resource must select the root's $defs/Tag. apidom-reference's
+           * $anchor selector (OpenAPI 3.1 and JSON Schema 2020-12 alike) searches embedded $id
+           * resources too and takes the first match, the embedded one. When ApiDOM stops the
+           * search at nested $ids, this test starts failing: turn it into a regular test.
+           */
+          test.failing('should select the $anchor of the referencing resource', async () => {
+            const actual = await dereferenceFixture('anchor-embedded-resource');
+
+            expect(toValue(actual)).toEqual(loadDereferenced('anchor-embedded-resource'));
+          });
+        });
+
         describe('given a $ref to a $dynamicAnchor', () => {
           test('should dereference it like a $ref to an $anchor', async () => {
             const actual = await dereferenceFixture('dynamic-anchor');
