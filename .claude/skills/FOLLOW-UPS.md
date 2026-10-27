@@ -31,7 +31,21 @@ ones 3.2 doesn't need.
 `apidom-ns-json-schema-2020-12/src/index.ts` doesn't re-export them from
 `src/traversal/visitor.ts` (`apidom-ns-openapi-3-1` re-exports its own). Both apidom-reference's
 and this repository's JSON Schema dereference strategies need them; recorded in ApiDOM's
-`add-spec-version/references/json-schema-dialects.md` as a phase 3 prerequisite.
+`add-spec-version/references/json-schema-dialects.md` as a phase 3 prerequisite. 2026-10-26:
+exported on the ApiDOM branch `feat/json-schema-2020-12/phase-3` (`1fbd257e2`), not released yet;
+`feat/json-schema-2020-12` here uses it as a tarball.
+
+### 2.3 ⏳ ApiDOM: the `uri` selector misses relative `$id`s nested in relative `$id`s
+
+apidom-reference's `dereference/strategies/{openapi-3-1,openapi-3-2,json-schema-2020-12}/selectors/uri`
+resolves each candidate schema's `$id` chain against the `$ref` target (`resolveSchema$idField(uriStrippedHash, e)`)
+instead of the document's base URI. In a document without an absolute root `$id`, a `$ref` to an
+embedded resource whose relative `$id` sits under another relative `$id` (`$id: "nested/"` then
+`$id: "tag.json"`) finds nothing, falls back to retrieving `nested/tag.json`, and stays a `$ref`.
+OpenAPI 3.1 Schema Objects behave the same. Fix in ApiDOM (evaluate the chain against the
+retrieval URI of the document holding the candidates); swagger-client's fixture
+`json-schema-2020-12-swagger-client/json-schema/__fixtures__/id-relative-nested` is a
+`test.failing` that starts failing once the fix is installed (then make it a regular test).
 
 ### 2.2 ⏳ Swagger UI: `fn.resolve` lacks the 3.2 strategy
 

@@ -28,6 +28,20 @@ Answered (record them in the tracking doc as given):
 5. **allOf merging and macros** (2026-10-25): as for OpenAPI 3.1 Schema Objects. The dereference
    strategy merges `allOf` unless `mode: 'strict'` and applies `modelPropertyMacro`, so a schema
    resolves the same standalone and inside an OpenAPI 3.1 document.
+6. **References that cross dialects** (2026-10-26): out of scope in all four repositories. A
+   `$ref` from a 2020-12 document into another dialect's document is refracted as 2020-12.
+7. **Unreleased upstream** (2026-10-26): a step starts once the ApiDOM PR is ready, on tarballs
+   packed from its branch (`../../add-oas-support/references/unreleased-upstream.md`), and merges
+   only after the ApiDOM release, with the tarballs replaced and every gate run again. No
+   prerelease on npm.
+8. **Content-detecting JSON Schema parsers** (2026-10-26): only in this strategy's parser list,
+   never in one the OpenAPI strategies use: external files of OpenAPI documents often declare a
+   root `$schema`, and the OpenAPI dereference visitors expect them as generic ApiDOM. A
+   regression test resolves an OpenAPI 3.1 document whose external `$ref` target has a root
+   2020-12 `$schema` (apidom-reference's saturated configuration turns detection off for the
+   same reason).
+9. **`$ref` to a `$dynamicAnchor`** (2026-10-26): resolves like one to an `$anchor`; it comes with
+   apidom-reference's 2020-12 `$anchor` selector, so use that selector.
 
 ## PR Plan
 

@@ -29,8 +29,9 @@ equal to the identifier after removing an empty trailing `#`. Wrap in `try`/`cat
   returning its input: the OpenAPI normalization plugins (operation ids, parameters, security)
   have nothing to act on. Because of that the subtree resolver's `skipNormalization` list needs
   no entry; add one if the strategy ever normalizes.
-- `resolve.js` from `openapi-3-1-apidom/resolve.js`, with `JSONSchemaElement.refract(spec)` (and
-  its `WeakMap` cache), `mediaTypes.latest()` of the namespace, apidom-reference's
+- `resolve.js` from `openapi-3-1-apidom/resolve.js`, with the namespace's `refract(spec)` (and
+  its `WeakMap` cache; not `JSONSchemaElement.refract`, which apidom-ns-arazzo-1 reassigns to its
+  own refractor when both are loaded), `mediaTypes.latest()` of the namespace, apidom-reference's
   `json-schema-2020-12` resolve strategy, the parsers below plus JSON, YAML and binary, and the
   dereference strategy below. Keep the base URI logic, fragments (`pathDiscriminator`),
   `ReferenceSet`, `circularReplacer`, error collection and the invalid-pointer fallback: Swagger
@@ -41,7 +42,7 @@ equal to the identifier after removing an empty trailing `#`. Wrap in `try`/`cat
 
 From `openapi-json-3-1` / `openapi-yaml-3-1`: parser names
 `json-schema-{json,yaml}-2020-12-swagger-client`, the namespace's media types, `JSON.parse` /
-js-yaml `JSON_SCHEMA`, `JSONSchemaElement.refract`. Detect with the predicate on the parsed value
+js-yaml `JSON_SCHEMA`, the namespace's `refract`. Detect with the predicate on the parsed value
 rather than a regex over the text: a regex also matches a nested `$schema`. External files
 without a root `$schema` stay with the generic JSON/YAML parsers; the dereference visitor
 refracts what a `$ref` points at into a schema.
@@ -55,7 +56,10 @@ refracts what a `$ref` points at into a schema.
   (the namespace's traversal key), with its lineage, cycle, `$$ref` and error handling, and the
   `$anchor`/`uri` selectors imported from `dereference/strategies/json-schema-2020-12/selectors`.
   Drop `ReferenceElement`, `PathItemElement`, `LinkElement` and `ExampleElement`: they serve
-  OpenAPI objects. `$dynamicRef` stays untouched (decision 2).
+  OpenAPI objects. `$dynamicRef` stays untouched (decision 2). Unlike an OpenAPI root, a JSON
+  Schema root can have a `$ref`: its replacement keeps the `result` class (as apidom-reference's
+  2020-12 visitor does), or every later `$ref` into the document finds no parse result and stays
+  unresolved (fixture `root-ref`).
 - `visitors/root.js`: merge `dereference.js`, and per decision 5 `properties.js`
   (`modelPropertyMacro`) and `all-of.js` (unless `mode: 'strict'`), both moved to
   `JSONSchema202012Element`. No `parameters.js`.
