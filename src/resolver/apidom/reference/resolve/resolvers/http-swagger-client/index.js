@@ -42,12 +42,17 @@ class HTTPResolverSwaggerClient extends HTTPResolver {
             // undici supports mutations
             res.headers.delete('Content-Type');
           } catch {
-            // Fetch API has guards which prevent mutations
-            res = new Response(res.body, {
-              ...res,
-              headers: new Headers(res.headers),
-            });
-            res.headers.delete('Content-Type');
+            /**
+             * Fetch API has guards which prevent mutations, so the response is copied.
+             * status, statusText and url are getters of Response.prototype: spreading the
+             * response copies none of them, which turned every response into a 200 OK.
+             * The Response constructor can't set url, so the copy gets it as own property.
+             */
+            const { status, statusText, url } = res;
+            const headers = new Headers(res.headers);
+            headers.delete('Content-Type');
+            res = new Response(res.body, { status, statusText, headers });
+            Object.defineProperty(res, 'url', { value: url });
           }
 
           return res;

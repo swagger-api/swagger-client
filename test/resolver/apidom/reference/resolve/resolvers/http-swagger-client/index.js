@@ -4,6 +4,7 @@ import { Buffer } from 'node:buffer';
 import { File, ResolverError } from '@swagger-api/apidom-reference/configuration/empty';
 import * as undici from 'undici';
 
+import SwaggerClient from '../../../../../../../src/index.js';
 import Http from '../../../../../../../src/http/index.js';
 import HTTPResolverSwaggerClient from '../../../../../../../src/resolver/apidom/reference/resolve/resolvers/http-swagger-client/index.js';
 
@@ -182,6 +183,104 @@ describe('HTTPResolverSwaggerClient', () => {
                 done();
               });
             }
+          });
+        });
+      });
+
+      describe('given the Fetch API guards the response headers', () => {
+        /**
+         * Browsers return fetch responses whose headers can't be mutated (undici allows it),
+         * so the resolver copies the response to remove its Content-Type.
+         */
+        const guardedResponse = (body, init, url) => {
+          const response = new Response(body, init);
+          ['append', 'delete', 'set'].forEach((method) => {
+            Object.defineProperty(response.headers, method, {
+              value: () => {
+                throw new TypeError('Headers are immutable');
+              },
+            });
+          });
+          Object.defineProperty(response, 'url', { value: url });
+          return response;
+        };
+        const mockFetch = (...args) =>
+          jest.spyOn(globalThis, 'fetch').mockImplementation(async () => guardedResponse(...args));
+
+        afterEach(() => {
+          jest.restoreAllMocks();
+        });
+
+        test('should return the body of a successful response', async () => {
+          const url = 'https://example.com/schema.json';
+          mockFetch('data', { status: 200, headers: { 'Content-Type': 'application/json' } }, url);
+          const content = await resolver.read(new File({ uri: url }));
+
+          expect(content).toBeInstanceOf(ArrayBuffer);
+          expect(Buffer.from(content).toString()).toStrictEqual('data');
+        });
+
+        test('should throw on unexpected status codes', async () => {
+          const url = 'https://example.com/missing.json';
+          mockFetch(
+            '<html><body>Not Found</body></html>',
+            { status: 404, statusText: 'Not Found', headers: { 'Content-Type': 'text/html' } },
+            url
+          );
+          const error = await resolver.read(new File({ uri: url })).catch((e) => e);
+
+          expect(error).toBeInstanceOf(ResolverError);
+          expect(error).toHaveProperty('message', `Error downloading "${url}"`);
+          expect(error.cause).toMatchObject({ message: 'Not Found', status: 404 });
+        });
+
+        test('should pass the status and URL of the response to responseInterceptor', async () => {
+          const url = 'https://example.com/schema.json';
+          const redirectedURL = 'https://example.com/v2/schema.json';
+          const responseInterceptor = jest.fn();
+          resolver = new HTTPResolverSwaggerClient({
+            swaggerHTTPClientConfig: { responseInterceptor },
+          });
+          mockFetch(
+            'data',
+            { status: 203, statusText: 'Non-Authoritative', headers: { 'X-Id': '1' } },
+            redirectedURL
+          );
+          await resolver.read(new File({ uri: url }));
+
+          expect(responseInterceptor).toHaveBeenCalledTimes(1);
+          expect(responseInterceptor.mock.calls[0][0]).toMatchObject({
+            ok: true,
+            status: 203,
+            statusText: 'Non-Authoritative',
+            url: redirectedURL,
+            headers: { 'x-id': '1' },
+          });
+          expect(responseInterceptor.mock.calls[0][0].headers).not.toHaveProperty('content-type');
+        });
+
+        test('should report an external $ref to a missing document as an error', async () => {
+          const missingURL = 'https://example.com/schemas/missing.json';
+          mockFetch(
+            '<html><body>Not Found</body></html>',
+            { status: 404, statusText: 'Not Found', headers: { 'Content-Type': 'text/html' } },
+            missingURL
+          );
+          const { spec, errors } = await SwaggerClient.resolve({
+            spec: {
+              openapi: '3.1.0',
+              info: { title: 'test', version: '1.0.0' },
+              components: { schemas: { User: { $ref: 'schemas/missing.json' } } },
+            },
+            baseDoc: 'https://example.com/openapi.json',
+          });
+
+          expect(spec.components.schemas.User).toEqual({ $ref: 'schemas/missing.json' });
+          expect(errors).toHaveLength(1);
+          expect(errors[0]).toMatchObject({
+            message: expect.stringMatching(/^Could not resolve reference/),
+            $ref: 'schemas/missing.json',
+            fullPath: ['components', 'schemas', 'User', '$ref'],
           });
         });
       });
