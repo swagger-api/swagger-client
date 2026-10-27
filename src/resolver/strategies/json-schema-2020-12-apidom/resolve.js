@@ -98,8 +98,19 @@ const resolveJSONSchema202012Strategy = async (options) => {
     const refSet = new ReferenceSet({ refs: [jsonSchemaElementReference] });
     if (jsonPointer !== '') refSet.rootRef = undefined; // reset root reference as we want fragment to become the root reference
 
-    // prepare ancestors; needed for cases where fragment is not the document root
-    const ancestors = [new Set([fragmentElement])];
+    /**
+     * Prepare ancestors; needed for cases where fragment is not the document root.
+     * The lineage holds the root and every element along the pathDiscriminator, so a $ref
+     * from within the fragment to one of its ancestors (`"$ref": "#"` in a recursive schema)
+     * is detected as a cycle instead of being expanded without end.
+     */
+    const pathElements = [jsonSchemaElement];
+    pathDiscriminator.reduce((parentElement, token) => {
+      const element = jsonPointerEvaluate(parentElement, jsonPointerCompile([token]));
+      pathElements.push(element);
+      return element;
+    }, jsonSchemaElement);
+    const ancestors = [new Set(pathElements)];
 
     const errors = [];
     const dereferenced = await dereferenceApiDOM(fragmentElement, {

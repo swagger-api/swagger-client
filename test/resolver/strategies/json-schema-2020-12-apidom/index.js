@@ -12,6 +12,27 @@ const fixturePath = path.join(__dirname, '__fixtures__');
 const loadFixture = (name) => globalThis.loadJsonFile(path.join(fixturePath, name));
 const $schema = 'https://json-schema.org/draft/2020-12/schema';
 
+// recursive schemas whose $refs point to an ancestor of the resolved fragment
+const treeBaseDoc = 'https://example.com/schemas/tree.json';
+const tree = () => ({
+  $schema,
+  type: 'object',
+  properties: {
+    name: { type: 'string' },
+    children: { type: 'array', items: { $ref: '#' } },
+  },
+});
+const defsTree = () => ({
+  $schema,
+  properties: { root: { $ref: '#/$defs/Node' } },
+  $defs: {
+    Node: {
+      type: 'object',
+      properties: { children: { type: 'array', items: { $ref: '#/$defs/Node' } } },
+    },
+  },
+});
+
 const address = {
   type: 'object',
   properties: {
@@ -288,6 +309,22 @@ describe('resolve', () => {
         });
       });
 
+      describe('and pathDiscriminator points into a schema that references its ancestor', () => {
+        test('should resolve the reference to the ancestor as a cycle', async () => {
+          const { spec, errors } = await SwaggerClient.resolve({
+            spec: tree(),
+            baseDoc: treeBaseDoc,
+            pathDiscriminator: ['properties'],
+          });
+
+          expect(errors).toEqual([]);
+          expect(spec.properties.children).toEqual({
+            type: 'array',
+            items: { $ref: treeBaseDoc },
+          });
+        });
+      });
+
       describe('and mode is not set', () => {
         test('should merge allOf', async () => {
           const { spec } = await SwaggerClient.resolve({ spec: loadFixture('macros.json') });
@@ -431,6 +468,45 @@ describe('resolve', () => {
             Node: { type: 'object', properties: { value: { type: 'string' }, next: cycle } },
           },
           $$ref: `${DEFAULT_BASE_URL}/#/$defs/Node`,
+        });
+      });
+
+      describe('given a fragment whose $refs point to its ancestors', () => {
+        const rootCycle = { $ref: treeBaseDoc };
+
+        test.each([
+          [
+            ['properties'],
+            { name: { type: 'string' }, children: { type: 'array', items: rootCycle } },
+          ],
+          [['properties', 'children'], { type: 'array', items: rootCycle }],
+          [['properties', 'children', 'items'], rootCycle],
+        ])(
+          'should resolve %j with the $ref to the document root as a cycle',
+          async (fragmentPath, expected) => {
+            const result = await SwaggerClient.resolveSubtree(tree(), fragmentPath, {
+              baseDoc: treeBaseDoc,
+            });
+
+            expect(result).toEqual({ spec: expected, errors: [] });
+          }
+        );
+
+        test('should resolve a $ref to an ancestor in $defs as a cycle', async () => {
+          const result = await SwaggerClient.resolveSubtree(
+            defsTree(),
+            ['$defs', 'Node', 'properties'],
+            {
+              baseDoc: treeBaseDoc,
+            }
+          );
+
+          expect(result).toEqual({
+            spec: {
+              children: { type: 'array', items: { $ref: `${treeBaseDoc}#/$defs/Node` } },
+            },
+            errors: [],
+          });
         });
       });
     });
