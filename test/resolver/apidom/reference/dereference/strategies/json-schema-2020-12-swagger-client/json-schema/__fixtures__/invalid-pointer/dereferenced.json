@@ -1,0 +1,19 @@
+[
+  {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "user": {
+        "$ref": "#/$defs/Missing"
+      },
+      "profile": {
+        "type": "object"
+      }
+    },
+    "$defs": {
+      "Profile": {
+        "type": "object"
+      }
+    }
+  }
+]

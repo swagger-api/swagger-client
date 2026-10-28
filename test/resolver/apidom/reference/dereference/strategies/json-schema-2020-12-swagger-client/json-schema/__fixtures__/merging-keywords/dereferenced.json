@@ -1,0 +1,19 @@
+[
+  {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "user": {
+        "type": "object",
+        "description": "description of the referencing schema",
+        "readOnly": true
+      }
+    },
+    "$defs": {
+      "User": {
+        "description": "description of the referenced schema",
+        "type": "object"
+      }
+    }
+  }
+]

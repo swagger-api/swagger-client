@@ -1,0 +1,10 @@
+{
+  "$defs": {
+    "Profile": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" }
+      }
+    }
+  }
+}

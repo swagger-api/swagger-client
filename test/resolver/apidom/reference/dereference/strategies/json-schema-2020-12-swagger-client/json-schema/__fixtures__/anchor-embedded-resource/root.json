@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/root.json",
+  "type": "object",
+  "properties": {
+    "tag": { "$ref": "#tag" }
+  },
+  "$defs": {
+    "Embedded": {
+      "$id": "embedded.json",
+      "$defs": {
+        "Tag": { "$anchor": "tag", "type": "number" }
+      }
+    },
+    "Tag": { "$anchor": "tag", "type": "string" }
+  }
+}

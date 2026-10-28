@@ -1,0 +1,58 @@
+[
+  {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "user": {
+        "$anchor": "user",
+        "type": "object",
+        "properties": {
+          "profile": {
+            "$anchor": "profile",
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "profile": {
+        "$anchor": "profile",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "$defs": {
+      "User": {
+        "$anchor": "user",
+        "type": "object",
+        "properties": {
+          "profile": {
+            "$anchor": "profile",
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Profile": {
+        "$anchor": "profile",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+]

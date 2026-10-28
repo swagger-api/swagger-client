@@ -1,0 +1,11 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "External JSON Schema", "version": "1.0.0" },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "User": { "$ref": "./user.schema.json" },
+      "Address": { "$ref": "./user.schema.json#/$defs/Address" }
+    }
+  }
+}

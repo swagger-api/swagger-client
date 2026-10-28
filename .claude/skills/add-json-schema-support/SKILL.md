@@ -1,6 +1,6 @@
 ---
 name: add-json-schema-support
-description: Adds resolution of standalone JSON Schema documents (root `$schema`, no `openapi`/`swagger` field) to swagger-client, 2020-12 first, then 2019-09, Draft 7, 6 and 4, as in the "Standalone JSON Schema" design doc. Checks that the installed ApiDOM has the dialect's namespace and apidom-reference strategies, then builds a root-only `$schema` predicate, the `json-schema-<dialect>-apidom` resolve strategy over ApiDOM (so `$ref`s resolve against `$id` base URIs and `$anchor`s), a schema-only dereference strategy, parsers, registration ahead of the generic strategy and tests. Swagger UI resolves `$ref`s in its preview through this strategy. Use whenever someone wants swagger-client, Swagger UI or SwaggerEditor to resolve or dereference `$ref`s in a JSON Schema document or a specific draft, or asks why `$id`/`$anchor` references in a standalone schema don't resolve, even if they don't name this skill. Not for Schema Objects inside OpenAPI documents (that is add-oas-support).
+description: Adds resolution of standalone JSON Schema documents (root `$schema`, no `openapi`/`swagger`/`asyncapi`/`arazzo` field) to swagger-client, 2020-12 first, then 2019-09, Draft 7, 6 and 4, as in the "Standalone JSON Schema" design doc. Checks that the installed ApiDOM has the dialect's namespace and apidom-reference strategies, then builds a root-only `$schema` predicate, the `json-schema-<dialect>-apidom` resolve strategy over ApiDOM (so `$ref`s resolve against `$id` base URIs and `$anchor`s), a schema-only dereference strategy, parsers, registration ahead of the generic strategy and tests. Swagger UI resolves `$ref`s in its preview through this strategy. Use whenever someone wants swagger-client, Swagger UI or SwaggerEditor to resolve or dereference `$ref`s in a JSON Schema document or a specific draft, or asks why `$id`/`$anchor` references in a standalone schema don't resolve, even if they don't name this skill. Not for Schema Objects inside OpenAPI documents (that is add-oas-support).
 ---
 
 # Add Standalone JSON Schema Resolution to swagger-client
@@ -52,7 +52,8 @@ resolves `$ref`s through swagger-client, so swagger-client owns `$ref` resolutio
 Read `references/strategy-design.md` and `../add-oas-support/references/review-lessons.md`, then:
 
 1. Predicate `isJSONSchema<suffix>` in `src/helpers/json-schema-predicates.js` (root only, the
-   exact identifier with an empty fragment normalised, no `openapi`/`swagger` field).
+   exact identifier with an empty fragment normalised, no `openapi`, `swagger`, `asyncapi` or
+   `arazzo` field).
 2. Strategy `src/resolver/strategies/json-schema-<dialect>-apidom/` (`index.js`, `resolve.js`,
    `normalize.js`).
 3. Parsers `src/resolver/apidom/reference/parse/parsers/json-schema-{json,yaml}-<dialect>/`.

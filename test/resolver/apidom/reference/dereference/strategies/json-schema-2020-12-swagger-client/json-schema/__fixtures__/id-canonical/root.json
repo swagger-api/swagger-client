@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/root.json",
+  "type": "object",
+  "properties": {
+    "user": { "$ref": "user.json" },
+    "address": { "$ref": "https://example.com/schemas/user.json#/$defs/Address" },
+    "street": { "$ref": "user.json#street" }
+  },
+  "$defs": {
+    "User": {
+      "$id": "user.json",
+      "type": "object",
+      "properties": {
+        "address": { "$ref": "#/$defs/Address" }
+      },
+      "$defs": {
+        "Address": {
+          "type": "object",
+          "properties": {
+            "street": { "$anchor": "street", "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,51 @@
+[
+  {
+    "type": "object",
+    "properties": {
+      "profile": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "tag": {
+        "$anchor": "tag",
+        "type": "string"
+      }
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$defs": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "profile": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "tag": {
+            "$anchor": "tag",
+            "type": "string"
+          }
+        }
+      },
+      "Profile": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "Tag": {
+        "$anchor": "tag",
+        "type": "string"
+      }
+    }
+  }
+]
