@@ -34,7 +34,12 @@ class AllOfVisitor {
       }
 
       // collect errors if allOf keyword contains anything else than Schema Object
-      const includesSchemaElementOnly = schemaElement.allOf.content.every(isSchemaElement);
+      // circular references are replaced by generic ObjectElement containing only $ref (see circularReplacer)
+      const isCircularReplacement = (element) =>
+        isObjectElement(element) && !isSchemaElement(element) && element.hasKey('$ref');
+      const includesSchemaElementOnly = schemaElement.allOf.content.every(
+        (element) => isSchemaElement(element) || isCircularReplacement(element)
+      );
       if (!includesSchemaElementOnly) {
         const error = new TypeError('Elements in allOf must be objects');
         error.fullPath = [...toPath([...ancestors, parent, schemaElement]), 'allOf'];
