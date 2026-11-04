@@ -47,7 +47,7 @@
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
     "lint": "eslint src/ test/",
     "lint:fix": "npm run lint -- --fix",
-    "link:apidom": "npm link @swagger-api/apidom-core @swagger-api/apidom-error @swagger-api/apidom-ns-openapi-2 @swagger-api/apidom-ns-openapi-3-0 @swagger-api/apidom-ns-openapi-3-1 @swagger-api/apidom-ns-openapi-3-2 @swagger-api/apidom-ns-json-schema-draft-4 @swagger-api/apidom-ns-json-schema-draft-6 @swagger-api/apidom-ns-json-schema-draft-7 @swagger-api/apidom-ns-json-schema-2019-09 @swagger-api/apidom-ns-json-schema-2020-12 @swagger-api/apidom-json-pointer",
+    "link:apidom": "npm link @swagger-api/apidom-core @swagger-api/apidom-error @swagger-api/apidom-reference @swagger-api/apidom-ns-openapi-2 @swagger-api/apidom-ns-openapi-3-0 @swagger-api/apidom-ns-openapi-3-1 @swagger-api/apidom-ns-openapi-3-2 @swagger-api/apidom-ns-json-schema-draft-4 @swagger-api/apidom-ns-json-schema-draft-6 @swagger-api/apidom-ns-json-schema-draft-7 @swagger-api/apidom-ns-json-schema-2019-09 @swagger-api/apidom-ns-json-schema-2020-12 @swagger-api/apidom-json-pointer",
     "test": "run-s test:unit:coverage test:artifact",
     "test:unit": "cross-env BABEL_ENV=commonjs jest --runInBand --config ./config/jest/jest.unit.config.js",
     "test:unit:coverage": "cross-env BABEL_ENV=commonjs jest --runInBand --config ./config/jest/jest.unit.coverage.config.js",
