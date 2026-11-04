@@ -65,6 +65,26 @@ Objects behave the same. Fix in the same ApiDOM follow-up as 2.3 (stop the searc
 `json-schema-2020-12-swagger-client/json-schema/__fixtures__/anchor-embedded-resource` is a
 `test.failing` that starts failing once the fix is installed (then make it a regular test).
 
+### 2.5 ⏳ swagger-client: dereference visitors skip `indirections.pop()` on the circular `replace` return
+
+In `src/resolver/apidom/reference/dereference/strategies/{openapi-3-1,json-schema-2020-12}-swagger-client/visitors/dereference.js`,
+the circular `replace` branch returns before `this.indirections.pop()`, so a completed sibling
+reference stays in the active chain. With many sibling `$ref`s to a cycle (a root with 102 properties
+of `{ $ref: '#' }`), those past `maxDepth` (100) fail with a maximum dereference depth error. Balance
+every `push` with a `pop` in `finally`, covering the cycle, disabled-resolution and error returns, in
+every visitor method that pushes, and add a test with more sibling cycles than `maxDepth`. Found by
+Copilot on PR #4307; the 3.1 visitor has the same pattern, so fix both together. Not reproduced yet.
+
+### 2.6 ⏳ swagger-client: the resolve strategy cache reuses a graph that dereferencing mutates
+
+`src/resolver/strategies/{openapi-3-1,json-schema-2020-12}-apidom/resolve.js` cache the refracted
+element per `spec` object in a `WeakMap`, and dereference it with `immutable: false`. Resolving the
+same spec object twice with different options (default mode, then `mode: 'strict'`; another `baseDoc`
+or `allowMetaPatches`) can return results of the earlier run, such as already merged `allOf`s. Cache
+a pristine refracted graph and `cloneDeep` it per call, the first one included; check the cost on
+large documents. Found by Copilot on PR #4307; the 3.1 strategy has the same design, so change both
+together and add a test that resolves one spec object with two option sets. Not reproduced yet.
+
 ## 3. Evals
 
 ### 3.1 ⏳ Not run yet
