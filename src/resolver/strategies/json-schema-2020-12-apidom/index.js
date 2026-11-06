@@ -1,5 +1,4 @@
 import resolveJSONSchema202012Strategy from './resolve.js';
-import normalize from './normalize.js';
 import { isJSONSchema202012 } from '../../../helpers/json-schema-predicates.js';
 
 const jsonSchema202012ApiDOMStrategy = {
@@ -7,8 +6,10 @@ const jsonSchema202012ApiDOMStrategy = {
   match(spec) {
     return isJSONSchema202012(spec);
   },
+  // Standalone JSON Schema documents have nothing to normalize. The method is still required:
+  // `resolveSubtree` calls `strategy.normalize` on every strategy.
   normalize(spec) {
-    return normalize(spec);
+    return spec;
   },
   async resolve(options) {
     return resolveJSONSchema202012Strategy(options);

@@ -24,7 +24,6 @@ import JSONSchema2020_12ResolveStrategy from '@swagger-api/apidom-reference/reso
 
 import { DEFAULT_BASE_URL } from '../../../constants.js';
 import * as optionsUtil from '../../utils/options.js';
-import normalize from './normalize.js';
 import HTTPResolverSwaggerClient from '../../apidom/reference/resolve/resolvers/http-swagger-client/index.js';
 import JSONParser from '../../apidom/reference/parse/parsers/json/index.js';
 import YAMLParser from '../../apidom/reference/parse/parsers/yaml-1-2/index.js';
@@ -57,7 +56,6 @@ const resolveJSONSchema202012Strategy = async (options) => {
     pathDiscriminator = [],
     allowMetaPatches = false,
     useCircularStructures = false,
-    skipNormalization = false,
     modelPropertyMacro = null,
     mode = 'non-strict',
   } = options;
@@ -173,9 +171,7 @@ const resolveJSONSchema202012Strategy = async (options) => {
       },
     });
     const transcluded = transclude(fragmentElement, dereferenced, jsonSchemaElement);
-    const normalized = skipNormalization ? transcluded : normalize(transcluded);
-
-    return { spec: toValue(normalized), errors };
+    return { spec: toValue(transcluded), errors };
   } catch (error) {
     if (error instanceof JSONPointerEvaluateError) {
       return { spec, errors: [] };

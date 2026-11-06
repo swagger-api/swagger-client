@@ -27,9 +27,10 @@ equal to the identifier after removing an empty trailing `#`. Wrap in `try`/`cat
 ## Resolve Strategy: `src/resolver/strategies/json-schema-2020-12-apidom/`
 
 - `index.js`: `name: 'json-schema-2020-12-apidom'`, `match: isJSONSchema202012`, and `normalize`
-  returning its input: the OpenAPI normalization plugins (operation ids, parameters, security)
-  have nothing to act on. Because of that the subtree resolver's `skipNormalization` list needs
-  no entry; add one if the strategy ever normalizes.
+  returning its input inline: the OpenAPI normalization plugins (operation ids, parameters,
+  security) have nothing to act on. The method must exist because `resolveSubtree` calls
+  `strategy.normalize` on every strategy. The subtree resolver's `skipNormalization` list needs
+  no entry; add one, and a `normalize.js`, if the strategy ever normalizes.
 - `resolve.js` from `openapi-3-1-apidom/resolve.js`, with the namespace's `refract(spec)` (and
   its `WeakMap` cache; not `JSONSchemaElement.refract`, which apidom-ns-arazzo-1 reassigns to its
   own refractor when both are loaded), `mediaTypes.latest()` of the namespace, apidom-reference's
@@ -39,7 +40,6 @@ equal to the identifier after removing an empty trailing `#`. Wrap in `try`/`cat
   UI resolves subtrees lazily, so fragments are the main path. Seed the `ancestors` lineage with
   the root and every element along `pathDiscriminator`, not the fragment alone (decision 11):
   otherwise `"$ref": "#"` inside a resolved subtree expands until the stack overflows.
-- `normalize.js`: the identity, exported for the same shape as the other strategies.
 
 ## Parsers: `src/resolver/apidom/reference/parse/parsers/json-schema-{json,yaml}-2020-12/`
 
