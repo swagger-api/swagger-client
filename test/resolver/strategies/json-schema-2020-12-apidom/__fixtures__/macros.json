@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "pet": { "$ref": "#/$defs/Pet" },
+    "cat": {
+      "allOf": [
+        { "$ref": "#/$defs/Pet" },
+        { "type": "object", "properties": { "lives": { "type": "integer" } }, "required": ["lives"] }
+      ]
+    }
+  },
+  "$defs": {
+    "Pet": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" }
+      },
+      "required": ["name"]
+    }
+  }
+}

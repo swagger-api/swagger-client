@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Order",
+  "type": "object",
+  "properties": {
+    "customer": { "$ref": "#/$defs/Customer" },
+    "status": { "$ref": "#status" },
+    "address": { "$ref": "external.json#/$defs/Address" },
+    "items": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Item" }
+    },
+    "metadata": { "$dynamicRef": "#meta" }
+  },
+  "$defs": {
+    "Customer": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "address": { "$ref": "external.json#/$defs/Address" }
+      }
+    },
+    "Status": {
+      "$anchor": "status",
+      "type": "string",
+      "enum": ["open", "closed"]
+    },
+    "Item": {
+      "$id": "items/",
+      "type": "object",
+      "properties": {
+        "product": { "$ref": "product.json" },
+        "price": { "$ref": "price.json" }
+      },
+      "$defs": {
+        "Price": {
+          "$id": "https://example.com/schemas/items/price.json",
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "Meta": {
+      "$dynamicAnchor": "meta",
+      "type": "object"
+    }
+  }
+}

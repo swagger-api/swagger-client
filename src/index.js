@@ -9,6 +9,7 @@ import openApi2ResolveStrategy, { clearCache } from './resolver/strategies/opena
 import openApi30ResolveStrategy from './resolver/strategies/openapi-3-0/index.js';
 import openApi31ApiDOMResolveStrategy from './resolver/strategies/openapi-3-1-apidom/index.js';
 import openApi32ApiDOMResolveStrategy from './resolver/strategies/openapi-3-2-apidom/index.js';
+import jsonSchema202012ApiDOMResolveStrategy from './resolver/strategies/json-schema-2020-12-apidom/index.js';
 import { makeApisTagOperation } from './interfaces.js';
 import { execute, buildRequest, baseUrl } from './execute/index.js';
 import { opId, isHttpUrl } from './helpers/index.js';
@@ -20,8 +21,11 @@ import OpenApiJson3_1Parser from './resolver/apidom/reference/parse/parsers/open
 import OpenApiYaml3_1Parser from './resolver/apidom/reference/parse/parsers/openapi-yaml-3-1/index.js';
 import OpenApiJson3_2Parser from './resolver/apidom/reference/parse/parsers/openapi-json-3-2/index.js';
 import OpenApiYaml3_2Parser from './resolver/apidom/reference/parse/parsers/openapi-yaml-3-2/index.js';
+import JsonSchemaJson2020_12Parser from './resolver/apidom/reference/parse/parsers/json-schema-json-2020-12/index.js';
+import JsonSchemaYaml2020_12Parser from './resolver/apidom/reference/parse/parsers/json-schema-yaml-2020-12/index.js';
 import OpenApi3_1SwaggerClientDereferenceStrategy from './resolver/apidom/reference/dereference/strategies/openapi-3-1-swagger-client/index.js';
 import OpenApi3_2SwaggerClientDereferenceStrategy from './resolver/apidom/reference/dereference/strategies/openapi-3-2-swagger-client/index.js';
+import JsonSchema2020_12SwaggerClientDereferenceStrategy from './resolver/apidom/reference/dereference/strategies/json-schema-2020-12-swagger-client/index.js';
 
 Swagger.http = Http;
 Swagger.makeHttp = makeHttp.bind(null, Swagger.http);
@@ -30,6 +34,7 @@ Swagger.resolveStrategies = {
   'openapi-3-1-apidom': openApi31ApiDOMResolveStrategy,
   'openapi-3-0': openApi30ResolveStrategy,
   'openapi-2-0': openApi2ResolveStrategy,
+  'json-schema-2020-12-apidom': jsonSchema202012ApiDOMResolveStrategy,
   generic: genericResolveStrategy,
 };
 Swagger.resolve = makeResolve({
@@ -38,6 +43,7 @@ Swagger.resolve = makeResolve({
     Swagger.resolveStrategies['openapi-3-1-apidom'],
     Swagger.resolveStrategies['openapi-3-0'],
     Swagger.resolveStrategies['openapi-2-0'],
+    Swagger.resolveStrategies['json-schema-2020-12-apidom'],
     Swagger.resolveStrategies.generic,
   ],
 });
@@ -47,6 +53,7 @@ Swagger.resolveSubtree = makeResolveSubtree({
     Swagger.resolveStrategies['openapi-3-1-apidom'],
     Swagger.resolveStrategies['openapi-3-0'],
     Swagger.resolveStrategies['openapi-2-0'],
+    Swagger.resolveStrategies['json-schema-2020-12-apidom'],
     Swagger.resolveStrategies.generic,
   ],
 });
@@ -70,12 +77,15 @@ Swagger.apidom = {
       OpenApiYaml3_1Parser,
       OpenApiJson3_2Parser,
       OpenApiYaml3_2Parser,
+      JsonSchemaJson2020_12Parser,
+      JsonSchemaYaml2020_12Parser,
     },
   },
   dereference: {
     strategies: {
       OpenApi3_1SwaggerClientDereferenceStrategy,
       OpenApi3_2SwaggerClientDereferenceStrategy,
+      JsonSchema2020_12SwaggerClientDereferenceStrategy,
     },
   },
 };

@@ -28,6 +28,31 @@ Answered (record them in the tracking doc as given):
 5. **allOf merging and macros** (2026-10-25): as for OpenAPI 3.1 Schema Objects. The dereference
    strategy merges `allOf` unless `mode: 'strict'` and applies `modelPropertyMacro`, so a schema
    resolves the same standalone and inside an OpenAPI 3.1 document.
+6. **References that cross dialects** (2026-10-26): out of scope in all four repositories. A
+   `$ref` from a 2020-12 document into another dialect's document is refracted as 2020-12.
+7. **Unreleased upstream** (2026-10-26): a step starts once the ApiDOM PR is ready, on tarballs
+   packed from its branch (`../../add-oas-support/references/unreleased-upstream.md`), and merges
+   only after the ApiDOM release, with the tarballs replaced and every gate run again. No
+   prerelease on npm.
+8. **Content-detecting JSON Schema parsers** (2026-10-26): only in this strategy's parser list,
+   never in one the OpenAPI strategies use: external files of OpenAPI documents often declare a
+   root `$schema`, and the OpenAPI dereference visitors expect them as generic ApiDOM. A
+   regression test resolves an OpenAPI 3.1 document whose external `$ref` target has a root
+   2020-12 `$schema` (apidom-reference's saturated configuration turns detection off for the
+   same reason).
+9. **`$ref` to a `$dynamicAnchor`** (2026-10-26): resolves like one to an `$anchor`; it comes with
+   apidom-reference's 2020-12 `$anchor` selector, so use that selector.
+10. **API description documents with a root `$schema`** (2026-10-27): a document is standalone
+    JSON Schema only when its root has the dialect's `$schema` and none of the API description
+    fields `openapi`, `swagger`, `asyncapi` and `arazzo`. AsyncAPI and Arazzo documents with a
+    root `$schema` keep the strategy they had (`generic`); regression tests compare them with a
+    `generic`-only resolve.
+11. **`$ref`s to ancestors of a resolved subtree** (2026-10-27): the resolve strategy seeds the
+    dereference lineage with the document root and every element along `pathDiscriminator`, so
+    a `$ref` from the fragment to an ancestor (`"$ref": "#"`) is a cycle, not endless expansion.
+    The JSON Schema strategy gets it in its own PR; the same defect in `openapi-3-1-apidom` and
+    `openapi-3-2-apidom` is fixed in a separate PR off `main`
+    (`fix/resolver-subtree-ancestor-cycles`), not in the JSON Schema PR.
 
 ## PR Plan
 

@@ -1,0 +1,40 @@
+[
+  {
+    "type": "array",
+    "items": {
+      "$dynamicRef": "#items"
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://test.json-schema.org/typical-dynamic-resolution/root",
+    "$defs": {
+      "foo": {
+        "$dynamicAnchor": "items",
+        "type": "string"
+      },
+      "list": {
+        "$id": "list",
+        "type": "array",
+        "items": {
+          "$dynamicRef": "#items"
+        },
+        "$defs": {
+          "items": {
+            "$comment": "This is only needed to satisfy the bookending requirement",
+            "$dynamicAnchor": "items"
+          }
+        }
+      },
+      "sameResource": {
+        "type": "array",
+        "items": {
+          "$dynamicRef": "#/$defs/foo"
+        }
+      },
+      "unmatched": {
+        "items": {
+          "$dynamicRef": "#unknown"
+        }
+      }
+    }
+  }
+]

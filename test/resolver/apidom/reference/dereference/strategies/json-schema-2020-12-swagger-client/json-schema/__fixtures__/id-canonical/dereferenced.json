@@ -1,0 +1,76 @@
+[
+  {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/schemas/root.json",
+    "type": "object",
+    "properties": {
+      "user": {
+        "$id": "user.json",
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "object",
+            "properties": {
+              "street": {
+                "$anchor": "street",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "$defs": {
+          "Address": {
+            "type": "object",
+            "properties": {
+              "street": {
+                "$anchor": "street",
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "address": {
+        "type": "object",
+        "properties": {
+          "street": {
+            "$anchor": "street",
+            "type": "string"
+          }
+        }
+      },
+      "street": {
+        "$anchor": "street",
+        "type": "string"
+      }
+    },
+    "$defs": {
+      "User": {
+        "$id": "user.json",
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "object",
+            "properties": {
+              "street": {
+                "$anchor": "street",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "$defs": {
+          "Address": {
+            "type": "object",
+            "properties": {
+              "street": {
+                "$anchor": "street",
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+]

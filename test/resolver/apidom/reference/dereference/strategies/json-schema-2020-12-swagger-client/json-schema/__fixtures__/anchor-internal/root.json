@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "user": { "$ref": "#user" },
+    "profile": { "$ref": "#profile" }
+  },
+  "$defs": {
+    "User": {
+      "$anchor": "user",
+      "type": "object",
+      "properties": {
+        "profile": { "$ref": "#profile" }
+      }
+    },
+    "Profile": {
+      "$anchor": "profile",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" }
+      }
+    }
+  }
+}

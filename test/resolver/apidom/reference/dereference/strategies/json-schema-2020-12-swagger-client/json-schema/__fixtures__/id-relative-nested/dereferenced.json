@@ -1,0 +1,58 @@
+[
+  {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "user": {
+        "$id": "./nested/",
+        "type": "object",
+        "properties": {
+          "profile": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "tag": {
+            "$id": "tag.json",
+            "type": "string"
+          }
+        },
+        "$defs": {
+          "Tag": {
+            "$id": "tag.json",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "$defs": {
+      "User": {
+        "$id": "./nested/",
+        "type": "object",
+        "properties": {
+          "profile": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "tag": {
+            "$id": "tag.json",
+            "type": "string"
+          }
+        },
+        "$defs": {
+          "Tag": {
+            "$id": "tag.json",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+]

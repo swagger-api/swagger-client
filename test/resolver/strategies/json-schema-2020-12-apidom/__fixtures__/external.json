@@ -1,0 +1,15 @@
+{
+  "$defs": {
+    "Address": {
+      "type": "object",
+      "properties": {
+        "street": { "type": "string" },
+        "country": { "$ref": "#/$defs/Country" }
+      }
+    },
+    "Country": {
+      "type": "string",
+      "minLength": 2
+    }
+  }
+}

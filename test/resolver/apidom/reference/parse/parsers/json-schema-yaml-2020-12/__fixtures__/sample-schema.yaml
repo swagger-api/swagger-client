@@ -1,0 +1,16 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://example.com/schemas/user.yaml
+title: User
+type: object
+properties:
+  name:
+    type: string
+  address:
+    $ref: '#/$defs/Address'
+$defs:
+  Address:
+    $anchor: address
+    type: object
+    properties:
+      street:
+        type: string

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "user": { "$ref": "#/$defs/User" }
+  },
+  "$defs": {
+    "User": {
+      "$id": "./nested/",
+      "type": "object",
+      "properties": {
+        "profile": { "$ref": "ex.json#/$defs/Profile" },
+        "tag": { "$ref": "tag.json" }
+      },
+      "$defs": {
+        "Tag": {
+          "$id": "tag.json",
+          "type": "string"
+        }
+      }
+    }
+  }
+}
