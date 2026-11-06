@@ -13,7 +13,7 @@ jobs:
       # will not occur.
       - name: Dependabot metadata
         id: dependabot-metadata
-        uses: dependabot/fetch-metadata@57721ba1e64f4a53fe9300b820eeee8398b772fb
+        uses: dependabot/fetch-metadata@31c05b391d44611512409ed180dccbfa841e290d
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       # Here the PR gets approved.
