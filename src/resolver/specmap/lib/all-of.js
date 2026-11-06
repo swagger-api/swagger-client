@@ -41,10 +41,26 @@ export default {
 
     const patches = [];
 
+    // Generate patches that migrate $ref values based on ContextTree information,
+    // while each member is still in place at `allOf/<i>`: the members are about to
+    // be merged onto the parent, and deepmerge concatenates arrays, so a member's
+    // `oneOf/0` may end up at `oneOf/2` (swagger-api/swagger-ui#11018).
+    //
+    // These have to stay patches. Applying them also re-runs the refs plugin over
+    // each $ref, which is what keeps the cycle detection in refs.js fed; resolving
+    // the values inline instead lets recursive schemas expand without bound. The
+    // test that catches that is test/resolver/specmap/complex.js, not this plugin's.
+    val.forEach((toMerge, i) => {
+      if (specmap.isObject(toMerge)) {
+        // String(i), because a numeric token breaks escapeJsonPointerToken()
+        patches.push(...generateAbsoluteRefPatches(toMerge, [...fullPath, String(i)], { specmap }));
+      }
+    });
+
     // remove existing content
     patches.push(specmap.replace(parent, {}));
 
-    val.forEach((toMerge, i) => {
+    val.forEach((toMerge) => {
       if (!specmap.isObject(toMerge)) {
         if (alreadyAddError) {
           return null;
@@ -58,19 +74,6 @@ export default {
 
       // Deeply merge the member's contents onto the parent location
       patches.push(specmap.mergeDeep(parent, toMerge));
-
-      // Generate patches that migrate $ref values based on ContextTree information
-
-      // remove ["allOf"], which will not be present when these patches are applied
-      const collapsedFullPath = fullPath.slice(0, -1);
-
-      const absoluteRefPatches = generateAbsoluteRefPatches(toMerge, collapsedFullPath, {
-        getBaseUrlForNodePath: (nodePath) =>
-          specmap.getContext([...fullPath, i, ...nodePath]).baseDoc,
-        specmap,
-      });
-
-      patches.push(...absoluteRefPatches);
 
       return undefined;
     });

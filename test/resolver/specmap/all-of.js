@@ -658,4 +658,118 @@ describe('allOf', () => {
       },
     });
   });
+
+  describe('given allOf members with array keywords and $refs', () => {
+    // https://github.com/swagger-api/swagger-ui/issues/11018
+    const chartYaml = `
+ChartConfiguration:
+  type: object
+  properties:
+    chartTypes:
+      type: array
+      items:
+        $ref: '#/ChartType'
+  allOf:
+    - oneOf:
+        - properties:
+            view:
+              enum: [summary]
+        - properties:
+            view:
+              enum: [detail]
+    - oneOf:
+        - properties:
+            chartTypes:
+              type: array
+              items:
+                $ref: '#/ChartType'
+        - properties:
+            view:
+              enum: [detail]
+ChartType:
+  type: string
+  enum: [line, bar, pie]
+`;
+    const chartsYaml = `
+charts:
+  post:
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/chart.yml#/ChartConfiguration'
+`;
+
+    afterEach(() => {
+      plugins.refs.clearCache();
+    });
+
+    test('should absolutify $refs merged into concatenated arrays', async () => {
+      const mockPool = mockAgent.get('http://example.com');
+      mockPool.intercept({ path: '/paths/charts.yml' }).reply(200, chartsYaml);
+      mockPool.intercept({ path: '/schemas/chart.yml' }).reply(200, chartYaml);
+
+      const res = await mapSpec({
+        plugins: [plugins.refs, plugins.allOf],
+        allowMetaPatches: true,
+        context: { baseDoc: 'http://example.com/openapi.yml' },
+        spec: {
+          openapi: '3.0.3',
+          paths: { '/charts': { $ref: './paths/charts.yml#/charts' } },
+        },
+      });
+
+      expect(res.errors).toEqual([]);
+      const { schema } = res.spec.paths['/charts'].post.requestBody.content['application/json'];
+      expect(schema.oneOf).toHaveLength(4);
+      expect(schema.oneOf[2].properties.chartTypes.items).toEqual({
+        type: 'string',
+        enum: ['line', 'bar', 'pie'],
+        $$ref: 'http://example.com/schemas/chart.yml#/ChartType',
+      });
+    });
+
+    test('should not misplace $$ref patches when merging arrays', async () => {
+      const res = await mapSpec({
+        plugins: [plugins.refs, plugins.allOf],
+        allowMetaPatches: true,
+        spec: {
+          definitions: {
+            ChartType: { type: 'string', enum: ['line', 'bar', 'pie'] },
+            ChartConfiguration: {
+              allOf: [
+                { oneOf: [{ properties: { view: { enum: ['summary'] } } }] },
+                {
+                  oneOf: [
+                    {
+                      properties: {
+                        chartTypes: { type: 'array', items: { $ref: '#/definitions/ChartType' } },
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        },
+      });
+
+      expect(res.errors).toEqual([]);
+      expect(res.spec.definitions.ChartConfiguration.oneOf).toEqual([
+        { properties: { view: { enum: ['summary'] } } },
+        {
+          properties: {
+            chartTypes: {
+              type: 'array',
+              items: {
+                type: 'string',
+                enum: ['line', 'bar', 'pie'],
+                $$ref: '#/definitions/ChartType',
+              },
+            },
+          },
+        },
+      ]);
+    });
+  });
 });
