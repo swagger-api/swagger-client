@@ -251,6 +251,7 @@ const mod = Object.assign(plugin, {
   extract,
   jsonPointerToArray,
   unescapeJsonPointerToken,
+  escapeJsonPointerToken,
 });
 
 export default mod;
@@ -431,8 +432,19 @@ function unescapeJsonPointerToken(token) {
     return token;
   }
 
-  const params = new URLSearchParams(`=${token.replace(/~1/g, '/').replace(/~0/g, '~')}`);
-  return params.get('');
+  // Tokens come from a URI fragment, so they are percent-decoded first and
+  // only then is `~1`/`~0` unescaped (RFC 6901, section 6). This is not form
+  // decoding: `+`, `&` and `=` are literal characters here.
+  // Invalid percent-encodings are kept as they are.
+  const decoded = token.replace(/(?:%[0-9a-f]{2})+/gi, (match) => {
+    try {
+      return decodeURIComponent(match);
+    } catch {
+      return match;
+    }
+  });
+
+  return decoded.replace(/~1/g, '/').replace(/~0/g, '~');
 }
 
 /**
@@ -440,8 +452,17 @@ function unescapeJsonPointerToken(token) {
  * @api public
  */
 function escapeJsonPointerToken(token) {
-  const params = new URLSearchParams([['', token.replace(/~/g, '~0').replace(/\//g, '~1')]]);
-  return params.toString().slice(1);
+  const escaped = token.replace(/~/g, '~0').replace(/\//g, '~1');
+
+  try {
+    return encodeURIComponent(escaped);
+  } catch {
+    // lone surrogates can't be encoded; replace them with U+FFFD first
+    const wellFormed = Array.from(escaped, (char) =>
+      char.length === 1 && char >= '\uD800' && char <= '\uDFFF' ? '\uFFFD' : char
+    ).join('');
+    return encodeURIComponent(wellFormed);
+  }
 }
 
 function arrayToJsonPointer(arr) {
