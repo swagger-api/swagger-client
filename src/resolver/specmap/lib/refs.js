@@ -131,7 +131,8 @@ const plugin = {
       return undefined;
     }
 
-    const { baseDoc } = specmap.getContext(fullPath);
+    const context = specmap.getContext(fullPath);
+    const { baseDoc } = context;
     if (typeof ref !== 'string') {
       return new JSONRefError('$ref: must be a string (JSON-Ref)', {
         $ref: ref,
@@ -156,10 +157,15 @@ const plugin = {
       });
     }
 
+    const fullyQualifiedRef = fullyQualifyRef(basePath, pointer);
+    const refStack = context.refStack || [];
     let promOrVal;
     let tokens;
 
-    if (pointerAlreadyInPath(pointer, basePath, parent, specmap)) {
+    if (
+      refStack.indexOf(fullyQualifiedRef) > -1 ||
+      pointerAlreadyInPath(pointer, basePath, parent, specmap)
+    ) {
       // Cyclic reference!
       // if `useCircularStructures` is not set, just leave the reference
       // unresolved, but absolutify it so that we don't leave an invalid $ref
@@ -212,15 +218,17 @@ const plugin = {
     const absolutifiedRef = absolutifyPointer(ref, basePath);
 
     const patch = lib.replace(parent, promOrVal, { $$ref: absolutifiedRef });
-    if (basePath && basePath !== baseDoc) {
-      return [patch, lib.context(parent, { baseDoc: basePath })];
+    const resolvedContext = { refStack: refStack.concat(fullyQualifiedRef) };
+    if (basePath || baseDoc) {
+      resolvedContext.baseDoc = basePath;
     }
+    const contextPatch = lib.context(parent, resolvedContext);
 
     try {
       // prevents circular values from being constructed, unless we specifically
       // want that to happen
       if (!patchValueAlreadyInPath(specmap.state, patch) || specmapInstance.useCircularStructures) {
-        return patch;
+        return [patch, contextPatch];
       }
     } catch (e) {
       // if we're catching here, path traversal failed, so we should
@@ -452,6 +460,10 @@ function arrayToJsonPointer(arr) {
   return `/${arr.map(escapeJsonPointerToken).join('/')}`;
 }
 
+function fullyQualifyRef(basePath, pointer) {
+  return `${basePath || '<specmap-base>'}#${pointer}`;
+}
+
 const pointerBoundaryChar = (c) => !c || c === '/' || c === '#';
 
 function pointerIsAParent(pointer, parentPointer) {
@@ -486,7 +498,7 @@ function pointerAlreadyInPath(pointer, basePath, parent, specmap) {
   }
 
   const parentPointer = arrayToJsonPointer(parent);
-  const fullyQualifiedPointer = `${basePath || '<specmap-base>'}#${pointer}`;
+  const fullyQualifiedPointer = fullyQualifyRef(basePath, pointer);
 
   // dirty hack to strip `allof/[index]` from the path, in order to avoid cases
   // where we get false negatives because:
@@ -498,7 +510,7 @@ function pointerAlreadyInPath(pointer, basePath, parent, specmap) {
   // solution: always throw the allOf constructs out of paths we store
   // TODO: solve this with a global register, or by writing more metadata in
   // either allOf or refs plugin
-  const safeParentPointer = parentPointer.replace(/allOf\/\d+\/?/g, '');
+  const safeParentPointer = normalizeAllOfPath(parentPointer);
 
   // Case 1: direct cycle, e.g. a.b.c.$ref: '/a.b'
   // Detect by checking that the parent path doesn't start with pointer.
@@ -517,10 +529,12 @@ function pointerAlreadyInPath(pointer, basePath, parent, specmap) {
   let currPath = '';
   const hasIndirectCycle = parent.some((token) => {
     currPath = `${currPath}/${escapeJsonPointerToken(token)}`;
+    const safeCurrPath = normalizeAllOfPath(currPath);
     return (
-      refs[currPath] &&
-      refs[currPath].some(
+      refs[safeCurrPath] &&
+      refs[safeCurrPath].some(
         (ref) =>
+          ref === fullyQualifiedPointer ||
           pointerIsAParent(ref, fullyQualifiedPointer) ||
           pointerIsAParent(fullyQualifiedPointer, ref)
       )
@@ -536,6 +550,11 @@ function pointerAlreadyInPath(pointer, basePath, parent, specmap) {
   refs[safeParentPointer] = (refs[safeParentPointer] || []).concat(fullyQualifiedPointer);
 
   return undefined;
+}
+
+function normalizeAllOfPath(pointer) {
+  const normalized = pointer.replace(/allOf\/\d+\/?/g, '');
+  return normalized.length > 1 && normalized.endsWith('/') ? normalized.slice(0, -1) : normalized;
 }
 
 /**
