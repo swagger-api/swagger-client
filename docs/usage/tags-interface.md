@@ -276,11 +276,11 @@ Using AbortController, you can easily implement request timeouts.
 
 ###### Node.js
 
-AbortController needs to be introduced in Node.js environment via [abort-controller](https://www.npmjs.com/package/abort-controller) npm package.
+AbortController is available globally in all supported Node.js versions (Node.js >= 22).
+No need to install it explicitly.
 
 ```js
 const SwaggerClient = require('swagger-client');
-const AbortController = require('abort-controller');
 
 const controller = new AbortController();
 const { signal } = controller;
