@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.x, 24.x]
+        node-version: [22.x, 24.x, 26.x]
 
     steps:
     - uses: actions/checkout@v7
@@ -44,7 +44,7 @@ jobs:
     - name: Build swagger-client
       run: npm run build
     - name: Upload commonjs build artifacts
-      if: startsWith(matrix.node-version, '24')
+      if: startsWith(matrix.node-version, '26')
       uses: actions/upload-artifact@v7
       with:
         name: commonjs
@@ -90,5 +90,12 @@ jobs:
       with:
         node-version: 24.x
     - name: Run commonjs build artifacts on Node.js 24.x
+      run: node -p "require('./commonjs')"
+
+    - name: Use Node 26.x
+      uses: actions/setup-node@v7
+      with:
+        node-version: 26.x
+    - name: Run commonjs build artifacts on Node.js 26.x
       run: node -p "require('./commonjs')"
 
