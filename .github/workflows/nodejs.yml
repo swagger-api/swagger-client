@@ -28,7 +28,7 @@ jobs:
       uses: actions/cache@v6
       with:
         path: node_modules
-        key: node-modules-${{ hashFiles('package-lock.json') }}
+        key: node-modules-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
     - name: Install dependencies
       if: steps.cache-node-modules.outputs.cache-hit != 'true'
       run: npm ci
@@ -58,6 +58,7 @@ jobs:
     steps:
     - uses: actions/checkout@v7
     - name: Use Node.js
+      id: setup-node
       uses: actions/setup-node@v7
       with:
         node-version-file: .nvmrc
@@ -67,7 +68,7 @@ jobs:
       uses: actions/cache@v6
       with:
         path: node_modules
-        key: node-modules-${{ hashFiles('package-lock.json') }}
+        key: node-modules-${{ steps.setup-node.outputs.node-version }}-${{ hashFiles('package-lock.json') }}
 
     - name: Install dependencies
       if: steps.cache-node-modules.outputs.cache-hit != 'true'
