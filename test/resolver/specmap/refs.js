@@ -290,6 +290,45 @@ describe('refs', () => {
     test('should handle non-strings', () => {
       expect(refs.unescapeJsonPointerToken(1)).toEqual(1);
     });
+
+    test('should only percent-decode, not form-decode', () => {
+      expect(refs.unescapeJsonPointerToken('application~1problem+json')).toEqual(
+        'application/problem+json'
+      );
+      expect(refs.unescapeJsonPointerToken('q=1&r=2')).toEqual('q=1&r=2');
+      expect(refs.unescapeJsonPointerToken('a%20b%2Bc%26d')).toEqual('a b+c&d');
+      expect(refs.unescapeJsonPointerToken('%E2%82%AC')).toEqual('\u20ac');
+    });
+
+    test('should percent-decode before unescaping ~0 and ~1', () => {
+      expect(refs.unescapeJsonPointerToken('%7E1')).toEqual('/');
+      expect(refs.unescapeJsonPointerToken('%7E0')).toEqual('~');
+    });
+
+    test('should keep invalid percent-encodings as they are', () => {
+      expect(refs.unescapeJsonPointerToken('100%')).toEqual('100%');
+      expect(refs.unescapeJsonPointerToken('%zz%20x')).toEqual('%zz x');
+      expect(refs.unescapeJsonPointerToken('%FF')).toEqual('%FF');
+    });
+  });
+
+  describe('.escapeJsonPointerToken', () => {
+    test('should round-trip with .unescapeJsonPointerToken', () => {
+      ['a/b', '~', '~1', 'x y', 'x+y', 'a&b', 'q=1&r=2', '100%', '#hash', '\u20ac'].forEach(
+        (token) => {
+          const escaped = refs.escapeJsonPointerToken(token);
+          expect(refs.unescapeJsonPointerToken(escaped)).toEqual(token);
+        }
+      );
+    });
+
+    test('should not encode a space as "+"', () => {
+      expect(refs.escapeJsonPointerToken('x y')).toEqual('x%20y');
+    });
+
+    test('should replace lone surrogates instead of throwing', () => {
+      expect(refs.escapeJsonPointerToken('\ud800\ud83d\ude00')).toEqual('%EF%BF%BD%F0%9F%98%80');
+    });
   });
 
   describe('handle cyclic references', () => {
