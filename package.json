@@ -5,10 +5,7 @@
   "browser": {
     "./src/helpers/btoa.node.js": "./src/helpers/btoa.browser.js",
     "./lib/helpers/btoa.node.js": "./lib/helpers/btoa.browser.js",
-    "./es/helpers/btoa.node.js": "./es/helpers/btoa.browser.js",
-    "./src/helpers/abortcontroller-polyfill.node.js": "./src/helpers/abortcontroller-polyfill.browser.js",
-    "./es/helpers/abortcontroller-polyfill.node.js": "./es/helpers/abortcontroller-polyfill.browser.js",
-    "./lib/helpers/abortcontroller-polyfill.node.js": "./lib/helpers/abortcontroller-polyfill.browser.js"
+    "./es/helpers/btoa.node.js": "./es/helpers/btoa.browser.js"
   },
   "main": "lib/commonjs.js",
   "module": "es/index.js",
@@ -86,7 +83,6 @@
     "fast-json-patch": "^3.0.0-1",
     "js-yaml": "^4.3.2",
     "neotraverse": "=1.0.1",
-    "node-abort-controller": "^3.1.1",
     "openapi-path-templating": "^2.2.1",
     "openapi-server-url-templating": "^1.3.0",
     "ramda": "^0.30.1",
