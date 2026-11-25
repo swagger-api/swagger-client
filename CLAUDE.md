@@ -74,7 +74,6 @@ swagger-client/
 - **js-yaml**: YAML parsing
 - **deepmerge**: Deep object merging
 - **fast-json-patch**: JSON Patch operations
-- **node-abort-controller**: AbortController polyfill for Node.js
 - **openapi-path-templating**: Path parameter templating
 - **openapi-server-url-templating**: Server URL templating
 
@@ -113,7 +112,6 @@ The project uses environment-specific Babel configurations (see `babel.config.js
 The project uses conditional imports for platform-specific code:
 - `btoa.node.js` vs `btoa.browser.js`
 - `fetch-polyfill.node.js` vs `fetch-polyfill.browser.js`
-- `abortcontroller-polyfill.node.js` vs `abortcontroller-polyfill.browser.js`
 
 These are configured in `package.json` under the `browser` field.
 
