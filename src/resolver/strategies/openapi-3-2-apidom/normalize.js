@@ -42,7 +42,13 @@ const normalize = (element) => {
  * The function adapts the `normalize` function interface and is able to accept
  * Plain Old JavaScript Objects and returns Plain Old JavaScript Objects.
  */
+const pojoCache = new WeakMap();
+
 export const pojoAdapter = (normalizeFn) => (spec) => {
+  if (!pojoCache.has(normalizeFn)) pojoCache.set(normalizeFn, new WeakMap());
+  const cache = pojoCache.get(normalizeFn);
+  if (cache.has(spec)) return cache.get(spec);
+
   const openApiElement = OpenApi3_2Element.refract(spec);
   openApiElement.classes.push('result');
 
@@ -54,8 +60,9 @@ export const pojoAdapter = (normalizeFn) => (spec) => {
    * in `openapi-3-2-apidom` strategy resolve method.
    */
   resolveOpenAPI32Strategy.cache.set(value, normalized);
+  cache.set(spec, value);
 
-  return toValue(normalized);
+  return value;
 };
 
 export default normalize;
