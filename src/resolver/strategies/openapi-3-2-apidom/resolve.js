@@ -96,8 +96,19 @@ const resolveOpenAPI32Strategy = async (options) => {
     const refSet = new ReferenceSet({ refs: [openApiElementReference] });
     if (jsonPointer !== '') refSet.rootRef = undefined; // reset root reference as we want fragment to become the root reference
 
-    // prepare ancestors; needed for cases where fragment is not OpenAPI element
-    const ancestors = [new Set([fragmentElement])];
+    /**
+     * Prepare ancestors; needed for cases where fragment is not OpenAPI element.
+     * The lineage holds the root and every element along the pathDiscriminator, so a $ref
+     * from within the fragment to one of its ancestors (a recursive Schema Object) is
+     * detected as a cycle instead of being expanded without end.
+     */
+    const pathElements = [openApiElement];
+    pathDiscriminator.reduce((parentElement, token) => {
+      const element = jsonPointerEvaluate(parentElement, jsonPointerCompile([token]));
+      pathElements.push(element);
+      return element;
+    }, openApiElement);
+    const ancestors = [new Set(pathElements)];
 
     const errors = [];
     const dereferenced = await dereferenceApiDOM(fragmentElement, {
