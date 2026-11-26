@@ -6,6 +6,7 @@ import { OpenApi3_2Element } from '@swagger-api/apidom-ns-openapi-3-2';
 import normalize, {
   pojoAdapter,
 } from '../../../../../src/resolver/strategies/openapi-3-2-apidom/normalize.js';
+import resolveOpenAPI32Strategy from '../../../../../src/resolver/strategies/openapi-3-2-apidom/resolve.js';
 
 const fixturesPath = path.join(__dirname, '__fixtures__');
 
@@ -110,6 +111,21 @@ describe('helpers', () => {
       const normalized2 = toValue(pojoAdapter(normalize)(openApiElement));
 
       expect(normalized1).toEqual(normalized2);
+    });
+
+    test('should return the same POJO for the same input', () => {
+      const spec = globalThis.loadJsonFile(path.join(fixturesPath, 'parameters.json'));
+      const normalized1 = pojoAdapter(normalize)(spec);
+      const normalized2 = pojoAdapter(normalize)(spec);
+
+      expect(normalized1).toBe(normalized2);
+    });
+
+    test('should cache the refracted element under the returned POJO', () => {
+      const spec = globalThis.loadJsonFile(path.join(fixturesPath, 'parameters.json'));
+      const normalized = pojoAdapter(normalize)(spec);
+
+      expect(resolveOpenAPI32Strategy.cache.has(normalized)).toBe(true);
     });
   });
 });
