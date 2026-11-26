@@ -106,6 +106,10 @@ export function header({ req, parameter, value }) {
   }
 }
 
+const appendCookie = (req, cookieString) => {
+  req.headers.Cookie = req.headers.Cookie ? `${req.headers.Cookie}; ${cookieString}` : cookieString;
+};
+
 export function cookie({ req, parameter, value }) {
   const { name: cookieName } = parameter;
 
@@ -115,7 +119,7 @@ export function cookie({ req, parameter, value }) {
     const effectiveMediaType = Object.keys(parameter.content)[0];
     const cookieValue = serialize(value, effectiveMediaType);
 
-    req.headers.Cookie = serializeCookie({ [cookieName]: cookieValue });
+    appendCookie(req, serializeCookie({ [cookieName]: cookieValue }));
     return;
   }
 
@@ -132,6 +136,6 @@ export function cookie({ req, parameter, value }) {
         ? `${cookieName}=${serializedValue}`
         : serializedValue;
 
-    req.headers.Cookie = serializeCookie({ [cookieName]: cookieValue });
+    appendCookie(req, serializeCookie({ [cookieName]: cookieValue }));
   }
 }
