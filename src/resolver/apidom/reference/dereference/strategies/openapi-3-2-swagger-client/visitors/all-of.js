@@ -11,6 +11,24 @@ import { isSchemaElement } from '@swagger-api/apidom-ns-openapi-3-2';
 
 import toPath from '../utils/to-path.js';
 
+const childrenOf = (el) => {
+  const c = el && el.content;
+  if (Array.isArray(c)) return c;
+  if (c && typeof c === 'object' && 'key' in c) return [c.key, c.value];
+  if (c && typeof c === 'object' && c.element) return [c];
+  return [];
+};
+const hasCycle = (el, onPath = new Set(), done = new Set()) => {
+  if (!el || typeof el !== 'object') return false;
+  if (onPath.has(el)) return true;
+  if (done.has(el)) return false;
+  onPath.add(el);
+  const found = childrenOf(el).some((child) => hasCycle(child, onPath, done));
+  onPath.delete(el);
+  done.add(el);
+  return found;
+};
+
 class AllOfVisitor {
   options;
 
@@ -34,11 +52,25 @@ class AllOfVisitor {
       }
 
       // collect errors if allOf keyword contains anything else than Schema Object
-      const includesSchemaElementOnly = schemaElement.allOf.content.every(isSchemaElement);
+      // circular references are replaced by generic ObjectElement containing only $ref (see circularReplacer)
+      const isCircularReplacement = (element) =>
+        isObjectElement(element) && !isSchemaElement(element) && element.hasKey('$ref');
+      const includesSchemaElementOnly = schemaElement.allOf.content.every(
+        (element) => isSchemaElement(element) || isCircularReplacement(element)
+      );
       if (!includesSchemaElementOnly) {
         const error = new TypeError('Elements in allOf must be objects');
         error.fullPath = [...toPath([...ancestors, parent, schemaElement]), 'allOf'];
         this.options.dereference.dereferenceOpts?.errors?.push?.(error);
+        return undefined;
+      }
+
+      // variant: never merge when a circular placeholder is present
+      if (schemaElement.allOf.content.some((item) => isCircularReplacement(item))) {
+        return undefined;
+      }
+      // deepmerge cannot handle cyclic element graphs
+      if ([...schemaElement.allOf.content, schemaElement].some((item) => hasCycle(item))) {
         return undefined;
       }
 
